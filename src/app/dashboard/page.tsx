@@ -1,3 +1,5 @@
+"use client";
+
 import BalanceCard from '@/components/balance-card';
 import Marketplace from '@/components/marketplace';
 import QuickActions from '@/components/quick-actions';
@@ -5,13 +7,21 @@ import RecentTransactions from '@/components/recent-transactions';
 import ExpensesChart from '@/components/expenses-chart';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
+import React from 'react';
 
 export default function DashboardPage() {
+  const [userName, setUserName] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const name = localStorage.getItem('userName');
+    setUserName(name);
+  }, []);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col md:flex-row justify-between items-start gap-4">
         <div>
-          <h1 className="text-3xl font-bold font-headline tracking-tight">Bienvenue, Jean</h1>
+          <h1 className="text-3xl font-bold font-headline tracking-tight">Bienvenue, {userName || 'Utilisateur'}</h1>
           <p className="text-muted-foreground">Voici votre aperçu financier et commercial.</p>
         </div>
         <Alert className="max-w-md bg-amber-100 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 [&>svg]:text-amber-600 dark:[&>svg]:text-amber-400">

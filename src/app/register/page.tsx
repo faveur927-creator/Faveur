@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { registerUser } from '@/ai/flows/user-actions';
+import { registerUser, loginUser } from '@/ai/flows/user-actions';
 
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères." }),
@@ -39,9 +39,21 @@ export default function RegisterPage() {
       if (result.userId) {
         toast({
           title: "Compte créé avec succès!",
-          description: "Vous allez être redirigé vers le tableau de bord.",
+          description: "Connexion en cours...",
         });
-        router.push('/dashboard');
+        
+        // Automatically log the user in
+        const loginResult = await loginUser({ email: values.email, password: values.password });
+        if (loginResult.userId && loginResult.name) {
+          localStorage.setItem('userName', loginResult.name);
+          router.push('/dashboard');
+        } else {
+           toast({
+            variant: "destructive",
+            title: "Erreur de connexion automatique",
+            description: loginResult.error,
+          });
+        }
       } else if (result.error) {
          toast({
           variant: "destructive",

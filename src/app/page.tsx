@@ -34,7 +34,8 @@ export default function LoginPage() {
     try {
       const result = await loginUser(values);
 
-      if (result.userId) {
+      if (result.userId && result.name) {
+        localStorage.setItem('userName', result.name);
         toast({
           title: `Bienvenue, ${result.name}!`,
           description: "Vous êtes maintenant connecté.",
