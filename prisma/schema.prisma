@@ -11,13 +11,14 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String    @unique
+  id             String    @id @default(cuid())
+  name           String?
+  email          String    @unique
   hashedPassword String
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
+  accounts       Account[]
+  transactions   Transaction[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 model Account {
@@ -25,10 +26,9 @@ model Account {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   balance   Float
-  currency  String   @default("FCFA")
+  currency  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  transactions Transaction[]
 }
 
 model Product {
@@ -37,16 +37,15 @@ model Product {
   description String?
   price       Float
   stock       Int
-  image       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model Transaction {
   id          String   @id @default(cuid())
-  accountId   String
-  account     Account  @relation(fields: [accountId], references: [id])
-  type        String // e.g., 'DEPOSIT', 'WITHDRAWAL', 'PURCHASE'
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        String // e.g., "DEPOSIT", "WITHDRAWAL", "PURCHASE"
   amount      Float
   description String
   createdAt   DateTime @default(now())
