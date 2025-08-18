@@ -65,14 +65,6 @@ const registerUserFlow = ai.defineFlow(
           hashedPassword,
         },
       });
-      
-      await prisma.account.create({
-        data: {
-          userId: newUser.id,
-          balance: 0,
-          currency: 'FCFA',
-        }
-      });
 
       return { userId: newUser.id };
     } catch (e) {
@@ -159,23 +151,19 @@ const getUserDataFlow = ai.defineFlow(
     async ({ userId }) => {
         try {
             const user = await prisma.user.findUnique({
-                where: { id: userId },
-                include: {
-                    accounts: true,
-                },
+                where: { id: userId }
             });
 
             if (!user) {
                 return { error: "Utilisateur non trouvé." };
             }
             
-            const account = user.accounts[0];
-
+            // Returning mock data as Account model is removed for now
             return {
                 name: user.name ?? undefined,
                 email: user.email,
-                balance: account?.balance,
-                currency: account?.currency,
+                balance: 0,
+                currency: 'FCFA',
             };
         } catch (e) {
             console.error(e);
