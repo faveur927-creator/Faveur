@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import Logo from '@/components/logo';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -12,6 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { loginUser } from '@/ai/flows/user-actions';
 
 const loginSchema = z.object({
   email: z.string().email({ message: "L'adresse e-mail n'est pas valide." }),
@@ -31,14 +31,30 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    // TODO: Implement login flow
-    console.log(values);
-    toast({
-      title: "Connexion en cours...",
-      description: "Cette fonctionnalité est en cours de développement.",
-    });
-    // For now, let's just navigate to the dashboard
-    router.push('/dashboard');
+    try {
+      const result = await loginUser(values);
+
+      if (result.userId) {
+        toast({
+          title: `Bienvenue, ${result.name}!`,
+          description: "Vous êtes maintenant connecté.",
+        });
+        router.push('/dashboard');
+      } else if (result.error) {
+        toast({
+          variant: "destructive",
+          title: "Erreur de connexion",
+          description: result.error,
+        });
+      }
+    } catch (error) {
+       console.error(error);
+       toast({
+        variant: "destructive",
+        title: "Une erreur inattendue est survenue",
+        description: "Veuillez réessayer plus tard.",
+      });
+    }
   };
 
   return (

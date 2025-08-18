@@ -5,6 +5,10 @@
  * - registerUser - Creates a new user in the database.
  * - RegisterUserInput - The input type for the registerUser function.
  * - RegisterUserOutput - The return type for the registerUser function.
+ * 
+ * - loginUser - Authenticates a user.
+ * - LoginUserInput - The input type for the loginUser function.
+ * - LoginUserOutput - The return type for the loginUser function.
  */
 
 import { ai } from '@/ai/genkit';
@@ -14,6 +18,7 @@ import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
+// Schema for user registration
 const RegisterUserInputSchema = z.object({
   name: z.string(),
   email: z.string().email(),
@@ -57,7 +62,6 @@ const registerUserFlow = ai.defineFlow(
         },
       });
       
-      // Create a default account for the new user
       await prisma.account.create({
         data: {
           userId: newUser.id,
@@ -72,4 +76,53 @@ const registerUserFlow = ai.defineFlow(
       return { error: "Une erreur est survenue lors de la création du compte." };
     }
   }
+);
+
+
+// Schema for user login
+const LoginUserInputSchema = z.object({
+  email: z.string().email(),
+  password: z.string(),
+});
+export type LoginUserInput = z.infer<typeof LoginUserInputSchema>;
+
+const LoginUserOutputSchema = z.object({
+  userId: z.string().optional(),
+  name: z.string().optional(),
+  error: z.string().optional(),
+});
+export type LoginUserOutput = z.infer<typeof LoginUserOutputSchema>;
+
+export async function loginUser(input: LoginUserInput): Promise<LoginUserOutput> {
+    return loginUserFlow(input);
+}
+
+const loginUserFlow = ai.defineFlow(
+    {
+        name: 'loginUserFlow',
+        inputSchema: LoginUserInputSchema,
+        outputSchema: LoginUserOutputSchema,
+    },
+    async ({ email, password }) => {
+        try {
+            const user = await prisma.user.findUnique({
+                where: { email },
+            });
+
+            if (!user) {
+                return { error: "L'e-mail ou le mot de passe est incorrect." };
+            }
+
+            const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
+
+            if (!isPasswordValid) {
+                return { error: "L'e-mail ou le mot de passe est incorrect." };
+            }
+
+            return { userId: user.id, name: user.name };
+        } catch (e) {
+            console.error(e);
+            return { error: "Une erreur est survenue lors de la connexion." };
+        }
+    }
 );
