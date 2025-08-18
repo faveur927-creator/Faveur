@@ -11,36 +11,43 @@ datasource db {
 }
 
 model User {
-  id            String       @id @default(cuid())
-  name          String?
-  email         String?      @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  balance       Float        @default(0)
-  transactions  Transaction[]
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  hashedPassword String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+}
+
+model Account {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  balance   Float
+  currency  String   @default("FCFA")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  transactions Transaction[]
 }
 
 model Product {
-  id          String @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
+  description String?
   price       Float
-  image       String
-  dataAiHint  String
   stock       Int
+  image       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  transactions Transaction[]
 }
 
 model Transaction {
   id          String   @id @default(cuid())
-  userId      String
-  productId   String
+  accountId   String
+  account     Account  @relation(fields: [accountId], references: [id])
+  type        String // e.g., 'DEPOSIT', 'WITHDRAWAL', 'PURCHASE'
   amount      Float
-  quantity    Int
+  description String
   createdAt   DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id])
-  product     Product  @relation(fields: [productId], references: [id])
 }
