@@ -25,7 +25,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Link href="/dashboard" asChild>
+                <Link href="/dashboard">
                   <SidebarMenuButton isActive>
                     <Home />
                     Tableau de bord
@@ -33,7 +33,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="#" asChild>
+                <Link href="#">
                   <SidebarMenuButton>
                     <Wallet />
                     Transactions
@@ -41,7 +41,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="#" asChild>
+                <Link href="#">
                   <SidebarMenuButton>
                     <ShoppingCart />
                     Marché
@@ -49,7 +49,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="#" asChild>
+                <Link href="#">
                   <SidebarMenuButton>
                     <Bell />
                     Notifications
@@ -61,7 +61,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <SidebarFooter>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Link href="#" asChild>
+                <Link href="#">
                   <SidebarMenuButton>
                     <Settings />
                     Paramètres
