@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "db-push": "PRISMA_DISABLE_OPENSSL_VALIDATION=1 npx prisma db push"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.14.1",
