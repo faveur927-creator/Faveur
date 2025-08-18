@@ -11,10 +11,13 @@ import React from 'react';
 
 export default function DashboardPage() {
   const [userName, setUserName] = React.useState<string | null>(null);
+  const [userId, setUserId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const name = localStorage.getItem('userName');
+    const id = localStorage.getItem('userId');
     setUserName(name);
+    setUserId(id);
   }, []);
 
   return (
@@ -35,7 +38,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <BalanceCard />
+          <BalanceCard userId={userId} />
           <QuickActions />
           <RecentTransactions />
         </div>

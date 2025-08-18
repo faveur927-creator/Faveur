@@ -9,6 +9,10 @@
  * - loginUser - Authenticates a user.
  * - LoginUserInput - The input type for the loginUser function.
  * - LoginUserOutput - The return type for the loginUser function.
+ *
+ * - getUserData - Retrieves user and account data.
+ * - GetUserDataInput - The input type for the getUserData function.
+ * - GetUserDataOutput - The return type for the getUserData function.
  */
 
 import { ai } from '@/ai/genkit';
@@ -123,6 +127,59 @@ const loginUserFlow = ai.defineFlow(
         } catch (e) {
             console.error(e);
             return { error: "Une erreur est survenue lors de la connexion." };
+        }
+    }
+);
+
+// Schema for getting user data
+const GetUserDataInputSchema = z.object({
+    userId: z.string(),
+});
+export type GetUserDataInput = z.infer<typeof GetUserDataInputSchema>;
+
+const GetUserDataOutputSchema = z.object({
+    name: z.string().optional(),
+    email: z.string().optional(),
+    balance: z.number().optional(),
+    currency: z.string().optional(),
+    error: z.string().optional(),
+});
+export type GetUserDataOutput = z.infer<typeof GetUserDataOutputSchema>;
+
+export async function getUserData(input: GetUserDataInput): Promise<GetUserDataOutput> {
+    return getUserDataFlow(input);
+}
+
+const getUserDataFlow = ai.defineFlow(
+    {
+        name: 'getUserDataFlow',
+        inputSchema: GetUserDataInputSchema,
+        outputSchema: GetUserDataOutputSchema,
+    },
+    async ({ userId }) => {
+        try {
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                include: {
+                    accounts: true,
+                },
+            });
+
+            if (!user) {
+                return { error: "Utilisateur non trouvé." };
+            }
+            
+            const account = user.accounts[0];
+
+            return {
+                name: user.name ?? undefined,
+                email: user.email,
+                balance: account?.balance,
+                currency: account?.currency,
+            };
+        } catch (e) {
+            console.error(e);
+            return { error: "Une erreur est survenue lors de la récupération des données." };
         }
     }
 );
