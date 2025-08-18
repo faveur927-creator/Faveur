@@ -31,13 +31,13 @@ export default function ProductCard({ product }: { product: Product }) {
         <CardContent className="p-0 flex-grow">
           <CardTitle className="text-lg font-headline mb-1 leading-tight">{product.name}</CardTitle>
           <Badge variant={product.stock > 10 ? "secondary" : "destructive"}>
-            Only {product.stock} left in stock!
+            Plus que {product.stock} en stock!
           </Badge>
         </CardContent>
         <CardFooter className="p-0 pt-4 flex items-center justify-between">
-          <p className="text-2xl font-bold font-headline text-primary">${product.price.toFixed(2)}</p>
+          <p className="text-2xl font-bold font-headline text-primary">{product.price.toFixed(2)} €</p>
           <Button>
-            <ShoppingCart className="mr-2 h-4 w-4" /> Buy Now
+            <ShoppingCart className="mr-2 h-4 w-4" /> Acheter
           </Button>
         </CardFooter>
       </div>

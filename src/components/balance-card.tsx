@@ -20,8 +20,8 @@ export default function BalanceCard() {
     if(amount > 0) {
       setBalance(prev => prev + amount);
       toast({
-        title: "Success",
-        description: `$${amount.toFixed(2)} has been added to your account.`,
+        title: "Succès",
+        description: `${amount.toFixed(2)} $ ont été ajoutés à votre compte.`,
       });
     }
     setDepositAmount('');
@@ -30,30 +30,30 @@ export default function BalanceCard() {
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardDescription className="flex items-center gap-2"><DollarSign className="w-4 h-4"/> Current Balance</CardDescription>
+        <CardDescription className="flex items-center gap-2"><DollarSign className="w-4 h-4"/> Solde actuel</CardDescription>
         <CardTitle className="text-4xl lg:text-5xl font-headline transition-all duration-300">
-          ${balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          ${balance.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </CardTitle>
       </CardHeader>
       <CardFooter className="gap-2">
         <Dialog>
           <DialogTrigger asChild>
             <Button className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold">
-              <ArrowDownCircle className="mr-2 h-4 w-4" /> Deposit
+              <ArrowDownCircle className="mr-2 h-4 w-4" /> Dépôt
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <form onSubmit={handleDeposit}>
               <DialogHeader>
-                <DialogTitle>Deposit Funds</DialogTitle>
+                <DialogTitle>Déposer des fonds</DialogTitle>
                 <DialogDescription>
-                  Enter the amount you'd like to deposit into your wallet. This is a mock transaction.
+                  Saisissez le montant que vous souhaitez déposer dans votre portefeuille. Ceci est une transaction fictive.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="amount" className="text-right">
-                    Amount
+                    Montant
                   </Label>
                   <Input
                     id="amount"
@@ -69,7 +69,7 @@ export default function BalanceCard() {
               </div>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button type="submit">Confirm Deposit</Button>
+                  <Button type="submit">Confirmer le dépôt</Button>
                 </DialogClose>
               </DialogFooter>
             </form>
@@ -77,7 +77,7 @@ export default function BalanceCard() {
         </Dialog>
 
         <Button variant="outline">
-          <ArrowUpCircle className="mr-2 h-4 w-4" /> Withdraw
+          <ArrowUpCircle className="mr-2 h-4 w-4" /> Retrait
         </Button>
       </CardFooter>
     </Card>

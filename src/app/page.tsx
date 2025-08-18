@@ -13,8 +13,8 @@ export default function LoginPage() {
           <div className="flex justify-center mb-4">
             <Logo />
           </div>
-          <CardTitle className="text-2xl font-headline">Welcome Back</CardTitle>
-          <CardDescription>Enter your credentials to access your account</CardDescription>
+          <CardTitle className="text-2xl font-headline">Bon retour</CardTitle>
+          <CardDescription>Entrez vos identifiants pour accéder à votre compte</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -24,24 +24,24 @@ export default function LoginPage() {
             </div>
             <div className="space-y-2">
               <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Mot de passe</Label>
                 <Link href="#" className="ml-auto inline-block text-sm underline hover:text-primary">
-                  Forgot your password?
+                  Mot de passe oublié?
                 </Link>
               </div>
               <Input id="password" type="password" required />
             </div>
             <Button type="submit" className="w-full font-bold" asChild>
-              <Link href="/dashboard">Sign In</Link>
+              <Link href="/dashboard">Se connecter</Link>
             </Button>
             <Button variant="outline" className="w-full">
-              Sign in with Google
+              Se connecter avec Google
             </Button>
           </div>
           <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
+            Vous n'avez pas de compte?{' '}
             <Link href="/register" className="underline hover:text-primary">
-              Sign up
+              S'inscrire
             </Link>
           </div>
         </CardContent>

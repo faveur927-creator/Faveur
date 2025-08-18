@@ -3,7 +3,7 @@ import ProductCard from '@/components/product-card';
 const products = [
   {
     id: '1',
-    name: 'Premium Wireless Headphones',
+    name: 'Casque sans fil Premium',
     price: 149.99,
     image: 'https://placehold.co/600x400.png',
     dataAiHint: 'headphones music',
@@ -11,7 +11,7 @@ const products = [
   },
   {
     id: '2',
-    name: 'Smart Fitness Tracker',
+    name: 'Tracker d\'Activité Intelligent',
     price: 89.50,
     image: 'https://placehold.co/600x400.png',
     dataAiHint: 'smart watch',
@@ -19,7 +19,7 @@ const products = [
   },
   {
     id: '3',
-    name: 'Portable Coffee Maker',
+    name: 'Machine à Café Portable',
     price: 65.00,
     image: 'https://placehold.co/600x400.png',
     dataAiHint: 'coffee maker',
@@ -27,7 +27,7 @@ const products = [
   },
   {
     id: '4',
-    name: 'Ergonomic Office Chair',
+    name: 'Chaise de Bureau Ergonomique',
     price: 299.00,
     image: 'https://placehold.co/600x400.png',
     dataAiHint: 'office chair',
@@ -38,7 +38,7 @@ const products = [
 export default function Marketplace() {
   return (
     <div>
-      <h2 className="text-2xl font-bold font-headline mb-4">Marketplace</h2>
+      <h2 className="text-2xl font-bold font-headline mb-4">Marché</h2>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {products.map(product => (
           <ProductCard key={product.id} product={product} />

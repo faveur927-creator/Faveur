@@ -13,13 +13,13 @@ export default function RegisterPage() {
           <div className="flex justify-center mb-4">
             <Logo />
           </div>
-          <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
-          <CardDescription>Enter your information to create a new account</CardDescription>
+          <CardTitle className="text-2xl font-headline">Créer un compte</CardTitle>
+          <CardDescription>Entrez vos informations pour créer un nouveau compte</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Nom</Label>
               <Input id="name" placeholder="John Doe" required />
             </div>
             <div className="space-y-2">
@@ -27,17 +27,17 @@ export default function RegisterPage() {
               <Input id="email" type="email" placeholder="m@example.com" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Mot de passe</Label>
               <Input id="password" type="password" required />
             </div>
             <Button type="submit" className="w-full font-bold" asChild>
-              <Link href="/dashboard">Create Account</Link>
+              <Link href="/dashboard">Créer un compte</Link>
             </Button>
           </div>
           <div className="mt-4 text-center text-sm">
-            Already have an account?{' '}
+            Vous avez déjà un compte?{' '}
             <Link href="/" className="underline hover:text-primary">
-              Sign in
+              Se connecter
             </Link>
           </div>
         </CardContent>

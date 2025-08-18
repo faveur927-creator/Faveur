@@ -18,14 +18,14 @@ export default function DashboardHeader() {
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search products..."
+          placeholder="Rechercher des produits..."
           className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
         />
       </div>
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="icon" className="rounded-full">
           <Bell className="h-5 w-5" />
-          <span className="sr-only">Toggle notifications</span>
+          <span className="sr-only">Activer/désactiver les notifications</span>
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -37,13 +37,13 @@ export default function DashboardHeader() {
               </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem>Paramètres</DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href="/">Logout</Link>
+              <Link href="/">Déconnexion</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -28,7 +28,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Link href="/dashboard" asChild>
                   <SidebarMenuButton isActive>
                     <Home />
-                    Dashboard
+                    Tableau de bord
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
@@ -44,7 +44,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Link href="#" asChild>
                   <SidebarMenuButton>
                     <ShoppingCart />
-                    Marketplace
+                    Marché
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
@@ -64,7 +64,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Link href="#" asChild>
                   <SidebarMenuButton>
                     <Settings />
-                    Settings
+                    Paramètres
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
