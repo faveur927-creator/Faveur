@@ -4,7 +4,7 @@ const products = [
   {
     id: '1',
     name: 'Casque sans fil Premium',
-    price: 149.99,
+    price: 90000,
     image: 'https://placehold.co/600x400.png',
     dataAiHint: 'headphones music',
     stock: 24,
@@ -12,7 +12,7 @@ const products = [
   {
     id: '2',
     name: 'Tracker d\'Activité Intelligent',
-    price: 89.50,
+    price: 54000,
     image: 'https://placehold.co/600x400.png',
     dataAiHint: 'smart watch',
     stock: 50,
@@ -20,7 +20,7 @@ const products = [
   {
     id: '3',
     name: 'Machine à Café Portable',
-    price: 65.00,
+    price: 39000,
     image: 'https://placehold.co/600x400.png',
     dataAiHint: 'coffee maker',
     stock: 15,
@@ -28,7 +28,7 @@ const products = [
   {
     id: '4',
     name: 'Chaise de Bureau Ergonomique',
-    price: 299.00,
+    price: 180000,
     image: 'https://placehold.co/600x400.png',
     dataAiHint: 'office chair',
     stock: 8,

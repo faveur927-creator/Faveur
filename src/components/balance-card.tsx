@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -11,7 +11,7 @@ import React from 'react';
 
 export default function BalanceCard() {
   const { toast } = useToast();
-  const [balance, setBalance] = React.useState(1234.56);
+  const [balance, setBalance] = React.useState(750000);
   const [depositAmount, setDepositAmount] = React.useState<number | string>('');
 
   const handleDeposit = (e: React.FormEvent) => {
@@ -21,7 +21,7 @@ export default function BalanceCard() {
       setBalance(prev => prev + amount);
       toast({
         title: "Succès",
-        description: `${amount.toFixed(2)} $ ont été ajoutés à votre compte.`,
+        description: `${amount.toLocaleString('fr-FR')} FCFA ont été ajoutés à votre compte.`,
       });
     }
     setDepositAmount('');
@@ -32,7 +32,7 @@ export default function BalanceCard() {
       <CardHeader>
         <CardDescription className="flex items-center gap-2"><DollarSign className="w-4 h-4"/> Solde actuel</CardDescription>
         <CardTitle className="text-4xl lg:text-5xl font-headline transition-all duration-300">
-          ${balance.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          {balance.toLocaleString('fr-FR')} FCFA
         </CardTitle>
       </CardHeader>
       <CardFooter className="gap-2">
@@ -42,7 +42,7 @@ export default function BalanceCard() {
               <ArrowDownCircle className="mr-2 h-4 w-4" /> Dépôt
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent>
             <form onSubmit={handleDeposit}>
               <DialogHeader>
                 <DialogTitle>Déposer des fonds</DialogTitle>
@@ -61,9 +61,8 @@ export default function BalanceCard() {
                     value={depositAmount}
                     onChange={(e) => setDepositAmount(e.target.value)}
                     className="col-span-3"
-                    placeholder="0.00"
+                    placeholder="10000"
                     required
-                    step="0.01"
                   />
                 </div>
               </div>

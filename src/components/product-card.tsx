@@ -35,7 +35,7 @@ export default function ProductCard({ product }: { product: Product }) {
           </Badge>
         </CardContent>
         <CardFooter className="p-0 pt-4 flex items-center justify-between">
-          <p className="text-2xl font-bold font-headline text-primary">{product.price.toFixed(2)} €</p>
+          <p className="text-2xl font-bold font-headline text-primary">{product.price.toLocaleString('fr-FR')} FCFA</p>
           <Button>
             <ShoppingCart className="mr-2 h-4 w-4" /> Acheter
           </Button>
