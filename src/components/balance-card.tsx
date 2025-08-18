@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
+import { DollarSign, ArrowDownCircle, ArrowUpCircle, Send } from 'lucide-react';
 import React from 'react';
 
 export default function BalanceCard() {
@@ -38,18 +38,18 @@ export default function BalanceCard() {
       <CardFooter className="gap-2">
         <Dialog>
           <DialogTrigger asChild>
-            <Button className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold">
+            <Button className="font-bold">
               <ArrowDownCircle className="mr-2 h-4 w-4" /> Dépôt
             </Button>
           </DialogTrigger>
           <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Déposer des fonds</DialogTitle>
+              <DialogDescription>
+                Saisissez le montant que vous souhaitez déposer dans votre portefeuille. Ceci est une transaction fictive.
+              </DialogDescription>
+            </DialogHeader>
             <form onSubmit={handleDeposit}>
-              <DialogHeader>
-                <DialogTitle>Déposer des fonds</DialogTitle>
-                <DialogDescription>
-                  Saisissez le montant que vous souhaitez déposer dans votre portefeuille. Ceci est une transaction fictive.
-                </DialogDescription>
-              </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="amount" className="text-right">
@@ -77,6 +77,10 @@ export default function BalanceCard() {
 
         <Button variant="outline">
           <ArrowUpCircle className="mr-2 h-4 w-4" /> Retrait
+        </Button>
+
+        <Button variant="outline">
+          <Send className="mr-2 h-4 w-4" /> Transfert
         </Button>
       </CardFooter>
     </Card>
