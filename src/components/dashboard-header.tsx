@@ -9,31 +9,46 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 
 export default function DashboardHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString())
-      params.set(name, value)
- 
+      if (value) {
+        params.set(name, value)
+      } else {
+        params.delete(name)
+      }
       return params.toString()
     },
     [searchParams]
   )
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    router.push(pathname + '?' + createQueryString('q', e.target.value))
-  };
+  useEffect(() => {
+    // Navigate to marketplace if user starts searching from another page
+    if (searchQuery && pathname !== '/dashboard/marketplace') {
+      router.push('/dashboard/marketplace?' + createQueryString('q', searchQuery));
+    } else {
+       const newUrl = `${pathname}?${createQueryString('q', searchQuery)}`;
+       // Using replace to avoid adding a new entry to the history stack for each character typed
+       router.replace(newUrl, { scroll: false });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, router, pathname]);
+
+  useEffect(() => {
+    setSearchQuery(searchParams.get('q') || '');
+  }, [searchParams]);
 
   const handleLogout = () => {
-    localStorage.removeItem('userName');
-    localStorage.removeItem('userId');
+    localStorage.clear();
     router.push('/');
   };
 
@@ -48,8 +63,8 @@ export default function DashboardHeader() {
           type="search"
           placeholder="Rechercher des produits..."
           className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
-          onChange={handleSearch}
-          defaultValue={searchParams.get('q') || ''}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          value={searchQuery}
         />
       </div>
       <div className="flex items-center gap-2">

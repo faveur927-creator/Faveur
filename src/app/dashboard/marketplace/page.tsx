@@ -1,9 +1,11 @@
+
 "use client";
 
 import Marketplace from '@/components/marketplace';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function MarketplacePage() {
+function MarketplaceContent() {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('q');
 
@@ -13,7 +15,15 @@ export default function MarketplacePage() {
             <h1 className="text-3xl font-bold font-headline tracking-tight">Marché</h1>
             <p className="text-muted-foreground">Découvrez et achetez des produits populaires.</p>
         </div>
-        <Marketplace searchQuery={searchQuery || ''} />
+        <Marketplace searchQuery={searchQuery} />
     </div>
+  );
+}
+
+export default function MarketplacePage() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <MarketplaceContent />
+    </Suspense>
   );
 }

@@ -1,15 +1,18 @@
+
 import ProductCard from '@/components/product-card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { products } from '@/lib/products';
 
 
-export default function Marketplace({ searchQuery }: { searchQuery?: string }) {
+export default function Marketplace({ searchQuery }: { searchQuery?: string | null }) {
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery?.toLowerCase() || '') ||
-    product.category.toLowerCase().includes(searchQuery?.toLowerCase() || '')
-  );
+  const filteredProducts = searchQuery
+    ? products.filter((product) =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.category.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : products;
 
 
   return (
