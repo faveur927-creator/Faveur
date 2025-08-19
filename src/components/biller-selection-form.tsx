@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from 'react';
@@ -86,7 +87,7 @@ export default function BillerSelectionForm() {
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Choisissez un service</CardTitle>
+          <CardTitle>Sélection de service</CardTitle>
           <CardDescription>Sélectionnez le type de facture que vous souhaitez payer.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -169,3 +170,4 @@ export default function BillerSelectionForm() {
     </Card>
   );
 }
+
