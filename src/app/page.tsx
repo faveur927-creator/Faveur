@@ -12,6 +12,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { loginUser } from '@/ai/flows/user-actions';
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { app } from '@/lib/firebase';
+import React from 'react';
 
 const loginSchema = z.object({
   email: z.string().email({ message: "L'adresse e-mail n'est pas valide." }),
@@ -21,6 +24,11 @@ const loginSchema = z.object({
 export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
+  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
+
+  const auth = getAuth(app);
+  const googleProvider = new GoogleAuthProvider();
+
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -56,6 +64,33 @@ export default function LoginPage() {
         title: "Une erreur inattendue est survenue",
         description: "Veuillez réessayer plus tard.",
       });
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+
+      if (user) {
+        localStorage.setItem('userName', user.displayName || 'Utilisateur');
+        localStorage.setItem('userId', user.uid);
+        toast({
+          title: `Bienvenue, ${user.displayName || 'Utilisateur'}!`,
+          description: "Vous êtes maintenant connecté avec Google.",
+        });
+        router.push('/dashboard');
+      }
+    } catch (error) {
+      console.error("Erreur de connexion Google: ", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur de connexion Google",
+        description: "Impossible de se connecter avec Google. Veuillez réessayer.",
+      });
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
@@ -108,8 +143,8 @@ export default function LoginPage() {
               </Button>
             </form>
           </Form>
-          <Button variant="outline" className="w-full mt-4">
-            Se connecter avec Google
+          <Button variant="outline" className="w-full mt-4" onClick={handleGoogleLogin} disabled={isGoogleLoading}>
+            {isGoogleLoading ? "Connexion en cours..." : "Se connecter avec Google"}
           </Button>
           <div className="mt-4 text-center text-sm">
             Vous n'avez pas de compte?{' '}
