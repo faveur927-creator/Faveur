@@ -59,7 +59,7 @@ export default function RootLayout({
                   <SidebarGroup>
                     <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
                       <SidebarMenuItem>
-                          <SidebarMenuButton asChild isActive={pathname === '/dashboard' || pathname === '/'}>
+                          <SidebarMenuButton asChild isActive={pathname === '/'}>
                             <Link href="/">
                               <Home />
                               Tableau de bord
@@ -75,8 +75,8 @@ export default function RootLayout({
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                       <SidebarMenuItem>
-                        <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/marketplace')}>
-                           <Link href="/dashboard/marketplace">
+                        <SidebarMenuButton asChild isActive={pathname.startsWith('/marketplace')}>
+                           <Link href="/marketplace">
                             <ShoppingCart />
                             Marché
                            </Link>
