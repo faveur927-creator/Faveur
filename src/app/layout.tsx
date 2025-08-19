@@ -18,7 +18,6 @@ import {
   SidebarSeparator,
   SidebarGroup,
   SidebarGroupLabel,
-  SidebarInset,
 } from "@/components/ui/sidebar";
 import { Home, ShoppingCart, Wallet, Settings, Bell, Store, BarChart, Package, PlusCircle, LayoutGrid } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard-header';
