@@ -33,7 +33,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="#">
+                <Link href="/dashboard/transactions">
                   <SidebarMenuButton>
                     <Wallet />
                     Transactions
@@ -41,7 +41,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="#">
+                <Link href="/dashboard/marketplace">
                   <SidebarMenuButton>
                     <ShoppingCart />
                     Marché
