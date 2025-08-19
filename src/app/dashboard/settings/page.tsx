@@ -25,6 +25,7 @@ export default function SettingsPage() {
   const [userName, setUserName] = React.useState<string | null>(null);
   const [userEmail, setUserEmail] = React.useState<string | null>(null);
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+  const [isUploading, setIsUploading] = React.useState(false);
   const { toast } = useToast();
 
   React.useEffect(() => {
@@ -48,7 +49,8 @@ export default function SettingsPage() {
     }
   };
 
-  const handleKycSubmit = () => {
+  const handleKycSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     if (!selectedFile) {
         toast({
             variant: 'destructive',
@@ -57,11 +59,37 @@ export default function SettingsPage() {
         });
         return;
     }
-    toast({
-        title: "Téléversement réussi",
-        description: `Votre document "${selectedFile.name}" a été envoyé pour vérification (simulation).`,
-    });
-    setSelectedFile(null); // Reset after upload
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+        const res = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            toast({
+                title: "Téléversement réussi",
+                description: `Votre document a été envoyé pour vérification.`,
+            });
+            setSelectedFile(null);
+        } else {
+            throw new Error(data.error || "Une erreur est survenue lors du téléversement.");
+        }
+    } catch (error: any) {
+        toast({
+            variant: 'destructive',
+            title: "Erreur de téléversement",
+            description: error.message,
+        });
+    } finally {
+        setIsUploading(false);
+    }
   };
 
   return (
@@ -111,33 +139,35 @@ export default function SettingsPage() {
 
              {/* KYC Card */}
             <Card>
-                <CardHeader>
-                    <CardTitle>Vérification d'Identité (KYC)</CardTitle>
-                    <CardDescription>Vérifiez votre identité pour débloquer toutes les fonctionnalités.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-muted rounded-md">
-                        <p className="font-medium">Statut</p>
-                        <Badge variant="destructive">Non vérifié</Badge>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="kyc-file">Pièce d'identité</Label>
-                        <Input id="kyc-file" type="file" onChange={handleFileChange} />
-                    </div>
-                    {selectedFile && (
-                    <div className="text-sm text-muted-foreground flex items-center gap-2 p-2 bg-muted rounded-md">
-                        <FileCheck className="h-4 w-4 text-green-500" />
-                        <span>{selectedFile.name}</span>
-                    </div>
-                    )}
-                    <p className="text-sm text-muted-foreground">
-                        Téléchargez une copie de votre CNI, passeport, etc.
-                    </p>
-                    <Button className="w-full" onClick={handleKycSubmit}>
-                        <Upload className="mr-2 h-4 w-4"/>
-                        Lancer la vérification
-                    </Button>
-                </CardContent>
+                 <form onSubmit={handleKycSubmit}>
+                    <CardHeader>
+                        <CardTitle>Vérification d'Identité (KYC)</CardTitle>
+                        <CardDescription>Vérifiez votre identité pour débloquer toutes les fonctionnalités.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="flex items-center justify-between p-3 bg-muted rounded-md">
+                            <p className="font-medium">Statut</p>
+                            <Badge variant="destructive">Non vérifié</Badge>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="kyc-file">Pièce d'identité</Label>
+                            <Input id="kyc-file" type="file" onChange={handleFileChange} disabled={isUploading} />
+                        </div>
+                        {selectedFile && (
+                        <div className="text-sm text-muted-foreground flex items-center gap-2 p-2 bg-muted rounded-md">
+                            <FileCheck className="h-4 w-4 text-green-500" />
+                            <span>{selectedFile.name}</span>
+                        </div>
+                        )}
+                        <p className="text-sm text-muted-foreground">
+                            Téléchargez une copie de votre CNI, passeport, etc.
+                        </p>
+                        <Button type="submit" className="w-full" disabled={isUploading || !selectedFile}>
+                            <Upload className="mr-2 h-4 w-4"/>
+                            {isUploading ? "Envoi en cours..." : "Lancer la vérification"}
+                        </Button>
+                    </CardContent>
+                 </form>
             </Card>
 
         </div>
