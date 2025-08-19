@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { loginUser } from '@/ai/flows/user-actions';
+import { loginUser, registerUser } from '@/ai/flows/user-actions';
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from '@/lib/firebase';
 import React from 'react';
@@ -72,22 +72,34 @@ export default function LoginPage() {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
 
-      if (user) {
-        // Here, we could also call a flow to register/login the user in our own DB
-        localStorage.setItem('userName', user.displayName || 'Utilisateur Google');
-        localStorage.setItem('userId', user.uid);
-        toast({
-          title: `Bienvenue, ${user.displayName || 'Utilisateur'}!`,
-          description: "Vous êtes maintenant connecté avec Google.",
+      if (user && user.email && user.displayName) {
+        // Register or login the user in our system
+        const registrationResult = await registerUser({
+          email: user.email,
+          name: user.displayName,
+          password: `google_auth_${user.uid}` // Dummy password for Google users
         });
-        router.push('/dashboard');
+
+        if (registrationResult.userId) {
+          localStorage.setItem('userName', user.displayName);
+          localStorage.setItem('userId', registrationResult.userId);
+          toast({
+            title: `Bienvenue, ${user.displayName}!`,
+            description: "Vous êtes maintenant connecté avec Google.",
+          });
+          router.push('/dashboard');
+        } else {
+           throw new Error(registrationResult.error || "Échec de l'inscription/connexion interne.");
+        }
+      } else {
+        throw new Error("Les informations de l'utilisateur Google sont incomplètes.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erreur de connexion Google: ", error);
       toast({
         variant: "destructive",
         title: "Erreur de connexion Google",
-        description: "Impossible de se connecter avec Google. Assurez-vous d'avoir activé ce fournisseur dans votre console Firebase.",
+        description: error.message || "Impossible de se connecter avec Google.",
       });
     } finally {
       setIsGoogleLoading(false);

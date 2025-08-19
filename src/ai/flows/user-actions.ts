@@ -54,7 +54,8 @@ const registerUserFlow = ai.defineFlow(
       const existingUser = users.find(user => user.email === email);
 
       if (existingUser) {
-        return { error: "Un utilisateur avec cet e-mail existe déjà." };
+        // If user exists, consider it a successful login and return their ID.
+        return { userId: existingUser.id };
       }
       
       const newUser = {
@@ -109,11 +110,15 @@ const loginUserFlow = ai.defineFlow(
                 return { error: "L'e-mail ou le mot de passe est incorrect." };
             }
 
-            const isPasswordValid = user.password === password;
+            // For google auth, we skip password check
+            if (!password.startsWith('google_auth_')) {
+              const isPasswordValid = user.password === password;
 
-            if (!isPasswordValid) {
-                return { error: "L'e-mail ou le mot de passe est incorrect." };
+              if (!isPasswordValid) {
+                  return { error: "L'e-mail ou le mot de passe est incorrect." };
+              }
             }
+
 
             return { userId: user.id, name: user.name };
         } catch (e) {
