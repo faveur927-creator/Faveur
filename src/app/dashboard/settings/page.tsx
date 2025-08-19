@@ -340,6 +340,29 @@ export default function SettingsPage() {
                             <Label htmlFor="shop-description">Description de la boutique</Label>
                             <Textarea id="shop-description" placeholder="Décrivez votre boutique, vos produits et ce qui vous rend unique." />
                         </div>
+
+                         <div className="space-y-4">
+                            <Label className="font-semibold">Adresse de la boutique</Label>
+                             <div className="grid sm:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="shop-district">Arrondissement</Label>
+                                    <Input id="shop-district" placeholder="Ex: Cocody" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="shop-neighborhood">Quartier</Label>
+                                    <Input id="shop-neighborhood" placeholder="Ex: Angré 7ème tranche" />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="shop-street">Rue (nom et numéro)</Label>
+                                <Input id="shop-street" placeholder="Ex: Rue des jardins, N°123" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="shop-landmark">Référentiel pour vous trouver (optionnel)</Label>
+                                <Input id="shop-landmark" placeholder="Ex: Près de la pharmacie des étoiles" />
+                            </div>
+                        </div>
+
                         <div className="grid sm:grid-cols-2 gap-4">
                              <div className="space-y-2">
                                 <Label htmlFor="shop-email">Email de contact</Label>
