@@ -12,8 +12,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { loginUser } from '@/ai/flows/user-actions';
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { app } from '@/lib/firebase';
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from '@/lib/firebase';
 import React from 'react';
 
 const loginSchema = z.object({
@@ -26,7 +26,6 @@ export default function LoginPage() {
   const router = useRouter();
   const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
 
-  const auth = getAuth(app);
   const googleProvider = new GoogleAuthProvider();
 
 
@@ -74,7 +73,8 @@ export default function LoginPage() {
       const user = result.user;
 
       if (user) {
-        localStorage.setItem('userName', user.displayName || 'Utilisateur');
+        // Here, we could also call a flow to register/login the user in our own DB
+        localStorage.setItem('userName', user.displayName || 'Utilisateur Google');
         localStorage.setItem('userId', user.uid);
         toast({
           title: `Bienvenue, ${user.displayName || 'Utilisateur'}!`,
@@ -87,7 +87,7 @@ export default function LoginPage() {
       toast({
         variant: "destructive",
         title: "Erreur de connexion Google",
-        description: "Impossible de se connecter avec Google. Veuillez réessayer.",
+        description: "Impossible de se connecter avec Google. Assurez-vous d'avoir activé ce fournisseur dans votre console Firebase.",
       });
     } finally {
       setIsGoogleLoading(false);
