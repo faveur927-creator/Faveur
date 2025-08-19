@@ -12,12 +12,11 @@ import { Lightbulb, Droplet, Wifi, Tv, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const billers = [
-  { id: 'CIE', name: 'CIE (Électricité)', icon: Lightbulb },
-  { id: 'SODECI', name: 'SODECI (Eau)', icon: Droplet },
-  { id: 'Canal+', name: 'Canal+ (TV)', icon: Tv },
-  { id: 'MTN', name: 'MTN (Internet/Data)', icon: Wifi },
-  { id: 'Orange', name: 'Orange (Téléphone)', icon: Smartphone },
-  { id: 'Startimes', name: 'StarTimes (TV)', icon: Tv },
+  { id: 'E2C', name: 'Électricité (E²C)', icon: Lightbulb },
+  { id: 'LCE', name: 'Eau (LCE)', icon: Droplet },
+  { id: 'Internet', name: 'Internet (Liquid Telecom, MTN, Airtel, CanalBox…)', icon: Wifi },
+  { id: 'TV', name: 'TV (Canal+, Startimes…)', icon: Tv },
+  { id: 'Telephone', name: 'Téléphone / Data (MTN, Airtel…)', icon: Smartphone },
 ];
 
 type Biller = typeof billers[0];
