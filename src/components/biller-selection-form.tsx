@@ -207,19 +207,23 @@ export default function BillerSelectionForm() {
                 <Label>Méthode de paiement</Label>
                 <RadioGroup
                   defaultValue="wallet"
-                  className="flex flex-col sm:flex-row gap-4"
+                  className="flex flex-col sm:flex-row gap-4 flex-wrap"
                   value={paymentMethod}
                   onValueChange={setPaymentMethod}
                 >
-                  <Label className="flex items-center gap-2 border rounded-lg p-3 w-full cursor-pointer hover:bg-accent has-[:checked]:bg-primary has-[:checked]:text-primary-foreground has-[:checked]:border-primary">
+                  <Label className="flex items-center gap-2 border rounded-lg p-3 w-full sm:w-auto flex-grow cursor-pointer hover:bg-accent has-[:checked]:bg-primary has-[:checked]:text-primary-foreground has-[:checked]:border-primary">
                     <RadioGroupItem value="wallet" id="wallet" />
                     Wallet Interne
                   </Label>
-                  <Label className="flex items-center gap-2 border rounded-lg p-3 w-full cursor-pointer hover:bg-accent has-[:checked]:bg-primary has-[:checked]:text-primary-foreground has-[:checked]:border-primary">
-                    <RadioGroupItem value="mobile_money" id="mobile_money" />
-                    Mobile Money
+                  <Label className="flex items-center gap-2 border rounded-lg p-3 w-full sm:w-auto flex-grow cursor-pointer hover:bg-accent has-[:checked]:bg-primary has-[:checked]:text-primary-foreground has-[:checked]:border-primary">
+                    <RadioGroupItem value="mtn_mobile_money" id="mtn_mobile_money" />
+                    MTN Mobile Money
                   </Label>
-                   <Label className="flex items-center gap-2 border rounded-lg p-3 w-full cursor-pointer hover:bg-accent has-[:checked]:bg-primary has-[:checked]:text-primary-foreground has-[:checked]:border-primary">
+                   <Label className="flex items-center gap-2 border rounded-lg p-3 w-full sm:w-auto flex-grow cursor-pointer hover:bg-accent has-[:checked]:bg-primary has-[:checked]:text-primary-foreground has-[:checked]:border-primary">
+                    <RadioGroupItem value="airtel_mobile_money" id="airtel_mobile_money" />
+                    Airtel Mobile Money
+                  </Label>
+                   <Label className="flex items-center gap-2 border rounded-lg p-3 w-full sm:w-auto flex-grow cursor-pointer hover:bg-accent has-[:checked]:bg-primary has-[:checked]:text-primary-foreground has-[:checked]:border-primary">
                     <RadioGroupItem value="card" id="card" />
                     Carte Bancaire
                   </Label>
