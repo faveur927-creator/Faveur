@@ -1,19 +1,35 @@
 
+"use client";
+
 import ProductCard from '@/components/product-card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { products } from '@/lib/products';
 import Link from 'next/link';
-
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useQueryParams } from '@/hooks/use-query-params';
 
 interface MarketplaceProps {
-  searchQuery?: string | null;
-  categoryQuery?: string | null;
   limit?: number;
 }
 
 
-export default function Marketplace({ searchQuery, categoryQuery, limit }: MarketplaceProps) {
+export default function Marketplace({ limit }: MarketplaceProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const { createQueryString } = useQueryParams();
+
+  const searchQuery = searchParams.get('q');
+  const categoryQuery = searchParams.get('category');
+  
+  const categories = [...new Set(products.map(p => p.category))];
+
+  const handleCategoryFilter = (category: string) => {
+    const newQuery = createQueryString('category', category === categoryQuery ? '' : category);
+    const targetPath = pathname === '/' ? '/marketplace' : pathname;
+    router.replace(`${targetPath}?${newQuery}`, { scroll: false });
+  };
 
   let filteredProducts = products;
 
@@ -32,10 +48,9 @@ export default function Marketplace({ searchQuery, categoryQuery, limit }: Marke
   const productsToDisplay = limit ? filteredProducts.slice(0, limit) : filteredProducts;
 
   const hasResults = productsToDisplay.length > 0;
-  const isFiltering = !!searchQuery || !!categoryQuery;
   
   const getPageTitle = () => {
-    if (limit) {
+    if (limit && !categoryQuery && !searchQuery) {
       return "Produits populaires";
     }
     if (categoryQuery) {
@@ -52,7 +67,7 @@ export default function Marketplace({ searchQuery, categoryQuery, limit }: Marke
     <div className="flex flex-col gap-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold font-headline">{getPageTitle()}</h2>
-        {limit && !isFiltering && (
+        {limit && (
             <Link href="/marketplace" passHref>
                 <Button variant="ghost">
                     Voir tout <ArrowRight className="ml-2 h-4 w-4" />
@@ -60,6 +75,24 @@ export default function Marketplace({ searchQuery, categoryQuery, limit }: Marke
             </Link>
         )}
       </div>
+
+       <div className="flex flex-wrap gap-2">
+            <Button
+                variant={!categoryQuery ? 'default' : 'outline'}
+                onClick={() => handleCategoryFilter('')}
+            >
+                Tous
+            </Button>
+            {categories.map((category) => (
+                <Button
+                    key={category}
+                    variant={categoryQuery === category ? 'default' : 'outline'}
+                    onClick={() => handleCategoryFilter(category)}
+                >
+                    {category}
+                </Button>
+            ))}
+        </div>
 
       {hasResults ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

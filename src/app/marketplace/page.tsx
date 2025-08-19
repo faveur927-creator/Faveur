@@ -2,34 +2,13 @@
 "use client";
 
 import Marketplace from '@/components/marketplace';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Suspense } from 'react';
-import { useQueryParams } from '@/hooks/use-query-params';
-import { products } from '@/lib/products';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 
 function MarketplaceContent() {
-  const searchParams = useSearchParams();
-  const { createQueryString } = useQueryParams();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const searchQuery = searchParams.get('q');
-  const categoryQuery = searchParams.get('category');
-
-  const categories = [...new Set(products.map(p => p.category))];
-
-  const handleCategoryFilter = (category: string) => {
-    // If the same category button is clicked again, we remove the filter.
-    // Otherwise, we set the new category filter.
-    const newQuery = createQueryString('category', category === categoryQuery ? '' : category);
-    router.replace(`${pathname}?${newQuery}`, { scroll: false });
-  };
-
   return (
     <div className="flex flex-col gap-8">
         <div className="flex items-center gap-4">
@@ -44,25 +23,7 @@ function MarketplaceContent() {
             </div>
         </div>
         
-        <div className="flex flex-wrap gap-2">
-            <Button
-                variant={!categoryQuery ? 'default' : 'outline'}
-                onClick={() => handleCategoryFilter('')}
-            >
-                Tous
-            </Button>
-            {categories.map((category) => (
-                <Button
-                    key={category}
-                    variant={categoryQuery === category ? 'default' : 'outline'}
-                    onClick={() => handleCategoryFilter(category)}
-                >
-                    {category}
-                </Button>
-            ))}
-        </div>
-
-        <Marketplace searchQuery={searchQuery} categoryQuery={categoryQuery} />
+        <Marketplace />
     </div>
   );
 }
