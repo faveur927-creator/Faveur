@@ -15,7 +15,7 @@ const actions = [
   {
     label: "Acheter du crédit",
     icon: Smartphone,
-    href: "#", // Placeholder
+    href: "/dashboard/buy-credit",
   },
   {
     label: "Aller au marché",
