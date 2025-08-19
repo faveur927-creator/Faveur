@@ -1,14 +1,23 @@
+
 "use client";
 
-import { Search, Bell, User } from 'lucide-react';
+import { Search, Bell } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardHeader() {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userId');
+    router.push('/');
+  };
+
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-card/50 backdrop-blur-md px-4 sm:h-16 sm:px-6">
       <div className='md:hidden'>
@@ -42,8 +51,8 @@ export default function DashboardHeader() {
             <DropdownMenuItem>Paramètres</DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href="/">Déconnexion</Link>
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+              Déconnexion
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
