@@ -41,7 +41,7 @@ export default function Marketplace({ searchQuery, categoryQuery, limit }: Marke
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold font-headline">{pageTitle}</h2>
         {limit && !isFiltering && (
-            <Link href="/dashboard/marketplace" passHref>
+            <Link href="/marketplace" passHref>
                 <Button variant="ghost">
                     Voir tout <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>

@@ -43,8 +43,8 @@ export default function DashboardHeader() {
     const newUrl = `${pathname}?${createQueryString('q', searchQuery)}`;
     
     // Si l'utilisateur recherche depuis une autre page que le marché, le rediriger
-    if (searchQuery && pathname !== '/dashboard/marketplace') {
-      router.push('/dashboard/marketplace?' + createQueryString('q', searchQuery));
+    if (searchQuery && pathname !== '/marketplace') {
+      router.push('/marketplace?' + createQueryString('q', searchQuery));
     } else {
        // Utilise replace pour éviter d'ajouter une entrée dans l'historique pour chaque caractère tapé
        router.replace(newUrl, { scroll: false });
@@ -59,7 +59,7 @@ export default function DashboardHeader() {
 
   const handleLogout = () => {
     localStorage.clear();
-    router.push('/');
+    router.push('/login');
   };
 
   return (
@@ -102,7 +102,7 @@ export default function DashboardHeader() {
             <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-                <Link href="/dashboard/settings">Paramètres</Link>
+                <Link href="/settings">Paramètres</Link>
             </DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />

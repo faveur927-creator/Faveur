@@ -10,22 +10,22 @@ const actions = [
   {
     label: "Payer une facture",
     icon: ReceiptText,
-    href: "/dashboard/pay-bill",
+    href: "/pay-bill",
   },
   {
     label: "Acheter du crédit",
     icon: Smartphone,
-    href: "/dashboard/buy-credit",
+    href: "/buy-credit",
   },
   {
     label: "Acheter un forfait",
     icon: Package,
-    href: "/dashboard/buy-bundle",
+    href: "/buy-bundle",
   },
   {
     label: "Aller au marché",
     icon: ShoppingCart,
-    href: "/dashboard/marketplace",
+    href: "/marketplace",
   },
 ];
 

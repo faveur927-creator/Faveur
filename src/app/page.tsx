@@ -1,128 +1,58 @@
 
 "use client";
 
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import Logo from '@/components/logo';
-import { useForm, useFormState } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
-import { loginUser } from '@/ai/flows/user-actions';
-import { Github } from 'lucide-react';
+import BalanceCard from '@/components/balance-card';
+import Marketplace from '@/components/marketplace';
+import QuickActions from '@/components/quick-actions';
+import RecentTransactions from '@/components/recent-transactions';
+import ExpensesChart from '@/components/expenses-chart';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Terminal } from 'lucide-react';
+import React from 'react';
 
-const loginSchema = z.object({
-  email: z.string().email({ message: "L'adresse e-mail n'est pas valide." }),
-  password: z.string().min(1, { message: "Le mot de passe est requis." }),
-});
+export default function DashboardPage() {
+  const [userName, setUserName] = React.useState<string | null>(null);
+  const [userId, setUserId] = React.useState<string | null>(null);
 
-
-export default function LoginPage() {
-  const { toast } = useToast();
-  const router = useRouter();
-  
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "demo@superapp.com",
-      password: "password123",
-    },
-  });
-
-  const { isSubmitting } = useFormState({ control: form.control });
-
-  const handleLoginSubmit = async (values: z.infer<typeof loginSchema>) => {
-    try {
-      // For the demo, we'll simulate a login.
-      // In a real app, this would call your backend.
-      const result = await loginUser(values);
-
-      if (result.userId && result.name) {
-        localStorage.setItem('userName', result.name);
-        localStorage.setItem('userId', result.userId);
-        localStorage.setItem('userEmail', values.email);
-        
-        toast({
-          title: `Connexion réussie!`,
-          description: `Bienvenue, ${result.name}.`,
-        });
-        router.push('/dashboard');
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Erreur de connexion",
-          description: result.error || "L'e-mail ou le mot de passe est incorrect.",
-        });
-      }
-    } catch (error) {
-       toast({
-        variant: "destructive",
-        title: "Erreur inattendue",
-        description: "Une erreur est survenue lors de la connexion.",
-      });
-      console.error(error);
-    }
-  };
+  React.useEffect(() => {
+    // Simulate login
+    const name = "Utilisateur Démo";
+    const id = "user_demo_123";
+    localStorage.setItem('userName', name);
+    localStorage.setItem('userId', id);
+    localStorage.setItem('userEmail', "demo@superapp.com");
+    setUserName(name);
+    setUserId(id);
+  }, []);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background p-4">
-      <Card className="mx-auto w-full max-w-sm shadow-2xl">
-        <CardHeader className="space-y-2 text-center">
-            <div className="flex justify-center mb-4">
-              <Logo />
-            </div>
-          <CardTitle className="text-2xl font-headline">Connectez-vous</CardTitle>
-          <CardDescription>
-            Entrez vos identifiants pour accéder à votre espace
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleLoginSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="m@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mot de passe</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full font-bold" disabled={isSubmitting}>
-                {isSubmitting ? "Connexion en cours..." : "Se connecter"}
-              </Button>
-            </form>
-          </Form>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+        <div>
+          <h1 className="text-3xl font-bold font-headline tracking-tight">Bienvenue, {userName || 'Utilisateur'}</h1>
+          <p className="text-muted-foreground">Voici votre aperçu financier et commercial.</p>
+        </div>
+        <Alert className="max-w-md bg-amber-100 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 [&>svg]:text-amber-600 dark:[&>svg]:text-amber-400">
+          <Terminal className="h-4 w-4" />
+          <AlertTitle className="text-amber-800 dark:text-amber-200">Mode Démonstration</AlertTitle>
+          <AlertDescription className="text-amber-700 dark:text-amber-300">
+            L'application est en mode démonstration avec des données simulées.
+          </AlertDescription>
+        </Alert>
+      </div>
 
-           <div className="mt-4 text-center text-sm">
-            Pas encore de compte?{' '}
-            <Link href="/register" className="underline hover:text-primary">
-              S'inscrire
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <BalanceCard userId={userId} />
+          <QuickActions />
+          <RecentTransactions />
+        </div>
+        <div className="lg:col-span-1 space-y-6">
+          <ExpensesChart />
+        </div>
+      </div>
+      
+      <Marketplace limit={4} />
     </div>
   );
 }
