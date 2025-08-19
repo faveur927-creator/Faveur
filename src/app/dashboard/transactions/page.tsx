@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -32,11 +33,6 @@ export default function TransactionsPage() {
   };
     
   return (
-    <div className="flex flex-col gap-8">
-        <div>
-            <h1 className="text-3xl font-bold font-headline tracking-tight">Transactions</h1>
-            <p className="text-muted-foreground">Consultez l'historique complet de vos opérations.</p>
-        </div>
         <Card>
             <CardHeader>
                 <CardTitle>Historique complet</CardTitle>
@@ -76,6 +72,5 @@ export default function TransactionsPage() {
                 </Table>
             </CardContent>
         </Card>
-    </div>
   );
 }

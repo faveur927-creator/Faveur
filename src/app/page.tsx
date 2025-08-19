@@ -9,6 +9,8 @@ import ExpensesChart from '@/components/expenses-chart';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
 import React from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import TransactionsPage from './dashboard/transactions/page';
 
 export default function DashboardPage() {
   const [userName, setUserName] = React.useState<string | null>(null);
@@ -41,18 +43,31 @@ export default function DashboardPage() {
         </Alert>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <BalanceCard userId={userId} />
-          <QuickActions />
-          <RecentTransactions />
-        </div>
-        <div className="lg:col-span-1 space-y-6">
-          <ExpensesChart />
-        </div>
-      </div>
-      
-      <Marketplace limit={4} />
+       <Tabs defaultValue="overview">
+        <TabsList>
+          <TabsTrigger value="overview">Aperçu</TabsTrigger>
+          <TabsTrigger value="marketplace">Marché</TabsTrigger>
+          <TabsTrigger value="transactions">Transactions</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                <BalanceCard userId={userId} />
+                <QuickActions />
+                <RecentTransactions />
+                </div>
+                <div className="lg:col-span-1 space-y-6">
+                <ExpensesChart />
+                </div>
+            </div>
+        </TabsContent>
+        <TabsContent value="marketplace" className="mt-6">
+            <Marketplace />
+        </TabsContent>
+        <TabsContent value="transactions" className="mt-6">
+            <TransactionsPage />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
