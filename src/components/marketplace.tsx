@@ -33,14 +33,14 @@ export default function Marketplace({ searchQuery, categoryQuery, limit }: Marke
 
   const hasResults = productsToDisplay.length > 0;
   const isFiltering = !!searchQuery || !!categoryQuery;
-  const pageTitle = isFiltering ? `Résultats de la recherche` : 'Produits populaires';
+  const pageTitle = limit ? "Produits populaires" : (isFiltering ? `Résultats de la recherche` : 'Tous les produits');
 
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold font-headline">{pageTitle}</h2>
-        {!isFiltering && (
+        {limit && !isFiltering && (
             <Link href="/dashboard/marketplace" passHref>
                 <Button variant="ghost">
                     Voir tout <ArrowRight className="ml-2 h-4 w-4" />

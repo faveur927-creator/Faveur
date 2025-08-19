@@ -1,3 +1,4 @@
+
 "use client";
 
 import BalanceCard from '@/components/balance-card';
@@ -14,12 +15,10 @@ export default function DashboardPage() {
   const [userId, setUserId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    // In demo mode, we can use a default user or skip this.
-    // For now, let's see if we can get data from local storage if it exists.
     const name = localStorage.getItem('userName');
     const id = localStorage.getItem('userId');
-    setUserName(name || "Utilisateur Anonyme");
-    setUserId(id || "user_anonymous");
+    setUserName(name || "Utilisateur");
+    setUserId(id || null);
   }, []);
 
   return (
@@ -33,7 +32,7 @@ export default function DashboardPage() {
           <Terminal className="h-4 w-4" />
           <AlertTitle className="text-amber-800 dark:text-amber-200">Mode Démonstration</AlertTitle>
           <AlertDescription className="text-amber-700 dark:text-amber-300">
-            La connexion est désactivée. Vous pouvez naviguer sur le tableau de bord.
+            L'application est en mode démonstration avec des données simulées.
           </AlertDescription>
         </Alert>
       </div>
@@ -49,7 +48,7 @@ export default function DashboardPage() {
         </div>
       </div>
       
-      <Marketplace />
+      <Marketplace limit={4} />
     </div>
   );
 }

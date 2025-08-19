@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarFooter,
 } from "@/components/ui/sidebar";
-import { Home, ShoppingCart, Wallet, Settings, Bell } from 'lucide-react';
+import { Home, ShoppingCart, Wallet, Settings, Bell, Store } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard-header';
 import Logo from '@/components/logo';
 
@@ -25,7 +25,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Link href="/">
+                <Link href="/dashboard">
                   <SidebarMenuButton>
                     <Home />
                     Tableau de bord
@@ -45,6 +45,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <SidebarMenuButton>
                     <ShoppingCart />
                     Marché
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href="/dashboard/vendor">
+                  <SidebarMenuButton>
+                    <Store />
+                    Espace Vendeur
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
