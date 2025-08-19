@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Search, Bell } from 'lucide-react';
+import { Search, Bell, ShoppingCart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -11,6 +11,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useQueryParams } from '@/hooks/use-query-params';
+import { Badge } from './ui/badge';
 
 
 export default function DashboardHeader() {
@@ -19,6 +20,24 @@ export default function DashboardHeader() {
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const { createQueryString } = useQueryParams();
+  const [cartCount, setCartCount] = useState(0);
+
+  const updateCartCount = () => {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    setCartCount(cart.reduce((acc: number, item: any) => acc + item.quantity, 0));
+  };
+  
+  useEffect(() => {
+    // Initial cart count
+    updateCartCount();
+    
+    // Listen for storage changes to update cart count across components
+    window.addEventListener('storage', updateCartCount);
+    return () => {
+      window.removeEventListener('storage', updateCartCount);
+    };
+  }, []);
+
 
   useEffect(() => {
     const newUrl = `${pathname}?${createQueryString('q', searchQuery)}`;
@@ -59,6 +78,13 @@ export default function DashboardHeader() {
         />
       </div>
       <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon" className="rounded-full relative">
+            <ShoppingCart className="h-5 w-5" />
+            {cartCount > 0 && (
+                <Badge className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{cartCount}</Badge>
+            )}
+            <span className="sr-only">Panier</span>
+        </Button>
         <Button variant="ghost" size="icon" className="rounded-full">
           <Bell className="h-5 w-5" />
           <span className="sr-only">Activer/désactiver les notifications</span>
