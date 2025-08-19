@@ -17,30 +17,46 @@ export default function BalanceCard({ userId }: { userId: string | null }) {
   const [isLoading, setIsLoading] = React.useState(true);
   const [depositAmount, setDepositAmount] = React.useState<number | string>('');
 
+  const updateBalanceFromStorage = () => {
+    const storedBalance = localStorage.getItem('userBalance');
+    if (storedBalance !== null) {
+      setBalance(parseFloat(storedBalance));
+    }
+  };
+
+  React.useEffect(() => {
+    // Listen for storage changes to update balance across components
+    window.addEventListener('storage', updateBalanceFromStorage);
+    return () => {
+      window.removeEventListener('storage', updateBalanceFromStorage);
+    };
+  }, []);
+  
   React.useEffect(() => {
     if (userId) {
       const fetchBalance = async () => {
         setIsLoading(true);
         try {
-          const data = await getUserData({ userId });
-          if (data.balance !== undefined && data.balance !== null) {
-            setBalance(data.balance);
-            setCurrency(data.currency || 'FCFA');
-          } else if (data.error) {
-            toast({
-              variant: "destructive",
-              title: "Erreur",
-              description: data.error,
-            });
-            setBalance(0);
+          // Check local storage first for persistence across the app
+          const storedBalance = localStorage.getItem('userBalance');
+          if (storedBalance) {
+            setBalance(parseFloat(storedBalance));
+            setCurrency('FCFA');
+          } else {
+            const data = await getUserData({ userId });
+            if (data.balance !== undefined && data.balance !== null) {
+              setBalance(data.balance);
+              setCurrency(data.currency || 'FCFA');
+              localStorage.setItem('userBalance', data.balance.toString());
+            } else if (data.error) {
+              toast({ variant: "destructive", title: "Erreur", description: data.error });
+              setBalance(0);
+              localStorage.setItem('userBalance', '0');
+            }
           }
         } catch (error) {
           console.error(error);
-          toast({
-            variant: "destructive",
-            title: "Erreur inattendue",
-            description: "Impossible de récupérer le solde.",
-          });
+          toast({ variant: "destructive", title: "Erreur inattendue", description: "Impossible de récupérer le solde." });
           setBalance(0);
         } finally {
           setIsLoading(false);
@@ -50,6 +66,7 @@ export default function BalanceCard({ userId }: { userId: string | null }) {
     } else {
         setIsLoading(false);
         setBalance(0);
+        localStorage.setItem('userBalance', '0');
     }
   }, [userId, toast]);
 
@@ -58,7 +75,11 @@ export default function BalanceCard({ userId }: { userId: string | null }) {
     e.preventDefault();
     const amount = Number(depositAmount);
     if(amount > 0 && balance !== null) {
-      setBalance(prev => (prev || 0) + amount);
+      const newBalance = (balance || 0) + amount;
+      setBalance(newBalance);
+      localStorage.setItem('userBalance', newBalance.toString());
+      window.dispatchEvent(new Event('storage'));
+
       toast({
         title: "Succès",
         description: `${amount.toLocaleString('fr-FR')} ${currency} ont été ajoutés à votre compte.`,

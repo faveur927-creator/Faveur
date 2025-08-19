@@ -13,14 +13,47 @@ import { useRouter } from 'next/navigation';
 export default function PayBillPage() {
   const { toast } = useToast();
   const router = useRouter();
+  const [amount, setAmount] = React.useState('');
+  const [biller, setBiller] = React.useState('');
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    // Simulate API call
+    const paymentAmount = parseFloat(amount);
+
+    if (isNaN(paymentAmount) || paymentAmount <= 0) {
+      toast({
+        variant: 'destructive',
+        title: 'Montant invalide',
+        description: 'Veuillez saisir un montant valide.',
+      });
+      return;
+    }
+    
+    // Simulate updating the balance in localStorage
+    try {
+        const currentBalance = parseFloat(localStorage.getItem('userBalance') || '0');
+        if (currentBalance < paymentAmount) {
+            toast({
+                variant: 'destructive',
+                title: 'Solde insuffisant',
+                description: 'Votre solde est insuffisant pour effectuer cette transaction.',
+            });
+            return;
+        }
+        const newBalance = currentBalance - paymentAmount;
+        localStorage.setItem('userBalance', newBalance.toString());
+        // Dispatch a storage event to notify other components like BalanceCard
+        window.dispatchEvent(new Event('storage'));
+    } catch(e) {
+        console.error("Could not update balance", e);
+    }
+
+
     toast({
       title: "Paiement réussi (Simulation)",
-      description: "Votre facture a été payée avec succès.",
+      description: `Votre facture de ${paymentAmount.toLocaleString('fr-FR')} FCFA pour ${biller} a été payée.`,
     });
+    
     router.push('/dashboard');
   };
 
@@ -45,17 +78,17 @@ export default function PayBillPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="biller">Facturier</Label>
-              <Select required>
+              <Select required onValueChange={setBiller} value={biller}>
                 <SelectTrigger id="biller">
                   <SelectValue placeholder="Sélectionnez un facturier" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="cie">CIE (Électricité)</SelectItem>
-                  <SelectItem value="sodeci">SODECI (Eau)</SelectItem>
-                  <SelectItem value="canal">Canal+ (TV)</SelectItem>
-                  <SelectItem value="startimes">StarTimes (TV)</SelectItem>
-                  <SelectItem value="mtn">MTN (Internet)</SelectItem>
-                  <SelectItem value="orange">Orange (Internet)</SelectItem>
+                  <SelectItem value="CIE">CIE (Électricité)</SelectItem>
+                  <SelectItem value="SODECI">SODECI (Eau)</SelectItem>
+                  <SelectItem value="Canal+">Canal+ (TV)</SelectItem>
+                  <SelectItem value="Startimes">StarTimes (TV)</SelectItem>
+                  <SelectItem value="MTN">MTN (Internet)</SelectItem>
+                  <SelectItem value="Orange">Orange (Internet)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -65,9 +98,16 @@ export default function PayBillPage() {
             </div>
              <div className="space-y-2">
               <Label htmlFor="amount">Montant (FCFA)</Label>
-              <Input id="amount" type="number" placeholder="Ex: 10000" required />
+              <Input 
+                id="amount" 
+                type="number" 
+                placeholder="Ex: 10000" 
+                required 
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={!biller || !amount}>
               Payer maintenant
             </Button>
           </form>
