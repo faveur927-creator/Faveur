@@ -1,9 +1,13 @@
+
+"use client";
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShoppingCart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 
 type Product = {
   id: string;
@@ -17,6 +21,37 @@ type Product = {
 };
 
 export default function ProductCard({ product }: { product: Product }) {
+    const { toast } = useToast();
+
+    const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault(); // Prevent any parent Link navigation
+        try {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const existingProductIndex = cart.findIndex((item: any) => item.id === product.id);
+
+            if (existingProductIndex > -1) {
+                cart[existingProductIndex].quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            window.dispatchEvent(new Event('storage')); // Notify other components
+
+            toast({
+              title: "Produit ajouté au panier !",
+              description: `${product.name} est maintenant dans votre panier.`,
+            });
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Erreur',
+                description: "Impossible d'ajouter le produit au panier."
+            })
+        }
+    };
+
+
   return (
     <Card className="overflow-hidden flex flex-col group hover:shadow-xl transition-shadow duration-300">
         <CardHeader className="p-0">
@@ -41,10 +76,8 @@ export default function ProductCard({ product }: { product: Product }) {
             </CardContent>
             <CardFooter className="p-0 pt-4 flex items-center justify-between">
             <p className="text-2xl font-bold font-headline text-primary">{product.price.toLocaleString('fr-FR')} FCFA</p>
-            <Button asChild>
-                <Link href={`/marketplace/${product.id}`}>
-                    <ShoppingCart className="mr-2 h-4 w-4" /> Acheter
-                </Link>
+            <Button onClick={handleAddToCart}>
+                <ShoppingCart className="mr-2 h-4 w-4" /> Acheter
             </Button>
             </CardFooter>
         </div>
