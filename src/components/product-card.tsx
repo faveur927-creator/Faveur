@@ -40,12 +40,10 @@ export default function ProductCard({ product }: { product: Product }) {
                 </CardContent>
                 <CardFooter className="p-0 pt-4 flex items-center justify-between">
                 <p className="text-2xl font-bold font-headline text-primary">{product.price.toLocaleString('fr-FR')} FCFA</p>
-                <Button onClick={(e) => {
-                    e.preventDefault(); // Prevent link navigation
-                    // Add to cart logic here
-                    console.log(`Added ${product.name} to cart`);
-                }}>
-                    <ShoppingCart className="mr-2 h-4 w-4" /> Acheter
+                <Button asChild>
+                    <Link href={`/dashboard/marketplace/${product.id}`}>
+                        <ShoppingCart className="mr-2 h-4 w-4" /> Acheter
+                    </Link>
                 </Button>
                 </CardFooter>
             </div>
