@@ -5,7 +5,7 @@ import { products } from '@/lib/products';
 import { notFound, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ShoppingCart, Star } from 'lucide-react';
+import { ShoppingCart, Star } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -23,14 +23,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const router = useRouter();
   const { toast } = useToast();
   
-  // Use React.use to unwrap the Promise-like params object
-  const safeParams = React.use(
-    new Promise<{ id: string }>((resolve) => {
-      resolve(params);
-    })
-  );
-
-  const product = products.find(p => p.id === safeParams.id);
+  const product = products.find(p => p.id === params.id);
 
   if (!product) {
     notFound();
