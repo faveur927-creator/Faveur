@@ -18,6 +18,7 @@ import {
   SidebarSeparator,
   SidebarGroup,
   SidebarGroupLabel,
+  SidebarInset,
 } from "@/components/ui/sidebar";
 import { Home, ShoppingCart, Wallet, Settings, Bell, Store, BarChart, Package, PlusCircle, LayoutGrid } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard-header';
@@ -135,7 +136,7 @@ export default function RootLayout({
                 </SidebarMenu>
               </SidebarFooter>
             </Sidebar>
-            <main className="flex-1">
+            <main className="flex-1 md:ml-[16rem]">
               <DashboardHeader />
               <div className="p-4 sm:p-6 lg:p-8">
                 {children}
