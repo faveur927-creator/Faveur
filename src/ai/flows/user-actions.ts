@@ -13,6 +13,10 @@
  * - getUserData - Retrieves user and account data.
  * - GetUserDataInput - The input type for the getUserData function.
  * - GetUserDataOutput - The return type for the getUserData function.
+ * 
+ * - sendOtp - Generates and "sends" an OTP.
+ * - SendOtpInput - The input type for the sendOtp function.
+ * - SendOtpOutput - The return type for the sendOtp function.
  */
 
 import { ai } from '@/ai/genkit';
@@ -161,4 +165,44 @@ const getUserDataFlow = ai.defineFlow(
             return { error: "Une erreur est survenue lors de la récupération des données." };
         }
     }
+);
+
+// Schema for sending OTP
+const SendOtpInputSchema = z.object({
+  phone: z.string(),
+});
+export type SendOtpInput = z.infer<typeof SendOtpInputSchema>;
+
+const SendOtpOutputSchema = z.object({
+  otp: z.string().optional(),
+  error: z.string().optional(),
+});
+export type SendOtpOutput = z.infer<typeof SendOtpOutputSchema>;
+
+export async function sendOtp(input: SendOtpInput): Promise<SendOtpOutput> {
+  return sendOtpFlow(input);
+}
+
+const sendOtpFlow = ai.defineFlow(
+  {
+    name: 'sendOtpFlow',
+    inputSchema: SendOtpInputSchema,
+    outputSchema: SendOtpOutputSchema,
+  },
+  async ({ phone }) => {
+    try {
+      // In a real app, you would integrate with an SMS gateway like Twilio here.
+      // For this simulation, we'll just generate a random 6-digit code.
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      console.log(`OTP for ${phone} is: ${otp}`); // Log for debugging
+
+      // We return the OTP so the frontend can display it for testing.
+      // In a real app, you would not return the OTP.
+      return { otp };
+
+    } catch (e) {
+      console.error(e);
+      return { error: "Une erreur est survenue lors de l'envoi de l'OTP." };
+    }
+  }
 );

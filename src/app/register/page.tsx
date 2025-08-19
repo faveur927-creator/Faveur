@@ -11,7 +11,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { registerUser, loginUser } from '@/ai/flows/user-actions';
+import { registerUser, loginUser, sendOtp } from '@/ai/flows/user-actions';
+import React from 'react';
 
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères." }),
@@ -24,6 +25,7 @@ const registerSchema = z.object({
 export default function RegisterPage() {
   const { toast } = useToast();
   const router = useRouter();
+  const [step, setStep] = React.useState('register'); // 'register' or 'verify_otp'
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -37,38 +39,19 @@ export default function RegisterPage() {
 
   const onSubmit = async (values: z.infer<typeof registerSchema>) => {
     try {
-      // For now, we'll keep the existing registration logic.
-      // We will replace this with OTP flow in the next steps.
-      const result = await registerUser({
-        name: values.name,
-        email: values.email,
-        password: values.password
-      });
+      const otpResult = await sendOtp({ phone: values.phone });
 
-      if (result.userId) {
+      if (otpResult.otp) {
         toast({
-          title: "Compte créé avec succès!",
-          description: "Connexion en cours...",
+          title: "Code de vérification envoyé (simulation)",
+          description: `Votre code est : ${otpResult.otp}`,
         });
-        
-        // Automatically log the user in
-        const loginResult = await loginUser({ email: values.email, password: values.password });
-        if (loginResult.userId && loginResult.name) {
-          localStorage.setItem('userName', loginResult.name);
-          localStorage.setItem('userId', loginResult.userId);
-          router.push('/dashboard');
-        } else {
-           toast({
-            variant: "destructive",
-            title: "Erreur de connexion automatique",
-            description: loginResult.error,
-          });
-        }
-      } else if (result.error) {
-         toast({
+        setStep('verify_otp');
+      } else {
+        toast({
           variant: "destructive",
-          title: "Erreur lors de l'inscription",
-          description: result.error,
+          title: "Erreur",
+          description: otpResult.error || "Impossible d'envoyer l'OTP.",
         });
       }
     } catch (error) {
@@ -147,7 +130,7 @@ export default function RegisterPage() {
                 )}
               />
               <Button type="submit" className="w-full font-bold" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Création en cours..." : "Créer un compte"}
+                {form.formState.isSubmitting ? "Envoi en cours..." : "Recevoir le code"}
               </Button>
             </form>
           </Form>
