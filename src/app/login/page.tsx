@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { loginUser } from '@/ai/flows/user-actions';
 import { auth, googleProvider, signInWithPopup } from '@/lib/firebase';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const loginSchema = z.object({
   email: z.string().email({ message: "L'adresse e-mail n'est pas valide." }),
@@ -118,39 +119,84 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleLoginSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="m@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mot de passe</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full font-bold" disabled={isSubmitting}>
-                {isSubmitting ? "Connexion en cours..." : "Se connecter"}
-              </Button>
-            </form>
-          </Form>
+           <Tabs defaultValue="client" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="client">Client</TabsTrigger>
+                <TabsTrigger value="vendor">Vendeur</TabsTrigger>
+              </TabsList>
+              <TabsContent value="client">
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(handleLoginSubmit)} className="space-y-4 pt-4">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input placeholder="m@example.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mot de passe</FormLabel>
+                          <FormControl>
+                            <Input type="password" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" className="w-full font-bold" disabled={isSubmitting}>
+                      {isSubmitting ? "Connexion en cours..." : "Se connecter"}
+                    </Button>
+                  </form>
+                </Form>
+              </TabsContent>
+               <TabsContent value="vendor">
+                 <Form {...form}>
+                    <form onSubmit={form.handleSubmit(handleLoginSubmit)} className="space-y-4 pt-4">
+                      {/* Vendor login can have specific fields in the future */}
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email Vendeur</FormLabel>
+                            <FormControl>
+                              <Input placeholder="boutique@example.com" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Mot de passe</FormLabel>
+                            <FormControl>
+                              <Input type="password" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button type="submit" className="w-full font-bold" disabled={isSubmitting}>
+                        {isSubmitting ? "Connexion en cours..." : "Accéder à ma boutique"}
+                      </Button>
+                    </form>
+                  </Form>
+              </TabsContent>
+            </Tabs>
+
 
             <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
