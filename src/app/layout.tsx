@@ -134,6 +134,14 @@ export default function RootLayout({
                             </Link>
                           </SidebarMenuButton>
                       </SidebarMenuItem>
+                       <SidebarMenuItem>
+                          <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/vendor/settings')}>
+                            <Link href="/dashboard/vendor/settings">
+                              <Store />
+                              Paramètres Boutique
+                            </Link>
+                          </SidebarMenuButton>
+                      </SidebarMenuItem>
                   </SidebarGroup>
 
                 </SidebarMenu>
@@ -144,7 +152,7 @@ export default function RootLayout({
                     <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/settings')}>
                       <Link href="/dashboard/settings">
                         <Settings />
-                        Paramètres
+                        Paramètres Compte
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
