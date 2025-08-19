@@ -12,11 +12,11 @@ import { Lightbulb, Droplet, Wifi, Tv, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const billers = [
-  { id: 'E2C', name: 'Électricité (E²C)', icon: Lightbulb },
-  { id: 'LCE', name: 'Eau (LCE)', icon: Droplet },
-  { id: 'Internet', name: 'Internet (Liquid Telecom, MTN, Airtel, CanalBox…)', icon: Wifi },
-  { id: 'TV', name: 'TV (Canal+, Startimes…)', icon: Tv },
-  { id: 'Telephone', name: 'Téléphone / Data (MTN, Airtel…)', icon: Smartphone },
+    { id: 'E2C', name: 'Électricité (E²C)', icon: Lightbulb },
+    { id: 'LCE', name: 'Eau (LCE)', icon: Droplet },
+    { id: 'Internet', name: 'Internet (Liquid Telecom, MTN, Airtel, CanalBox…)', icon: Wifi },
+    { id: 'TV', name: 'TV (Canal+, Startimes…)', icon: Tv },
+    { id: 'Telephone', name: 'Téléphone / Data (MTN, Airtel…)', icon: Smartphone },
 ];
 
 type Biller = typeof billers[0];
@@ -86,7 +86,7 @@ export default function BillerSelectionForm() {
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Étape 1: Choisissez un service</CardTitle>
+          <CardTitle>Choisissez un service</CardTitle>
           <CardDescription>Sélectionnez le type de facture que vous souhaitez payer.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -108,7 +108,7 @@ export default function BillerSelectionForm() {
   return (
     <Card className="max-w-2xl mx-auto w-full">
       <CardHeader>
-        <CardTitle>Étape 2: Payer votre facture {selectedBiller?.name}</CardTitle>
+        <CardTitle>Payer votre facture {selectedBiller?.name}</CardTitle>
         <CardDescription>Veuillez remplir les détails ci-dessous.</CardDescription>
       </CardHeader>
       <CardContent>
