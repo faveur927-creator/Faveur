@@ -9,7 +9,8 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useQueryParams } from '@/hooks/use-query-params';
 
 
 export default function DashboardHeader() {
@@ -17,31 +18,20 @@ export default function DashboardHeader() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
-
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (value) {
-        params.set(name, value)
-      } else {
-        params.delete(name)
-      }
-      return params.toString()
-    },
-    [searchParams]
-  )
+  const { createQueryString } = useQueryParams();
 
   useEffect(() => {
-    // Si l'utilisateur recherche depuis une autre page, le rediriger vers le marché
+    const newUrl = `${pathname}?${createQueryString('q', searchQuery)}`;
+    
+    // Si l'utilisateur recherche depuis une autre page que le marché, le rediriger
     if (searchQuery && pathname !== '/dashboard/marketplace') {
       router.push('/dashboard/marketplace?' + createQueryString('q', searchQuery));
     } else {
        // Utilise replace pour éviter d'ajouter une entrée dans l'historique pour chaque caractère tapé
-       const newUrl = `${pathname}?${createQueryString('q', searchQuery)}`;
        router.replace(newUrl, { scroll: false });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, router, pathname]);
+  }, [searchQuery]);
 
   // Met à jour la barre de recherche si les paramètres de l'URL changent (ex: navigation arrière/avant)
   useEffect(() => {

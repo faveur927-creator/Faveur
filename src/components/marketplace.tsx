@@ -6,23 +6,40 @@ import { products } from '@/lib/products';
 import Link from 'next/link';
 
 
-export default function Marketplace({ searchQuery }: { searchQuery?: string | null }) {
+interface MarketplaceProps {
+  searchQuery?: string | null;
+  categoryQuery?: string | null;
+  limit?: number;
+}
 
-  const filteredProducts = searchQuery
-    ? products.filter((product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : products;
 
-  const hasResults = filteredProducts.length > 0;
-  const isFiltering = !!searchQuery;
+export default function Marketplace({ searchQuery, categoryQuery, limit }: MarketplaceProps) {
+
+  let filteredProducts = products;
+
+  if (categoryQuery) {
+    filteredProducts = filteredProducts.filter((product) =>
+      product.category.toLowerCase() === categoryQuery.toLowerCase()
+    );
+  }
+
+  if (searchQuery) {
+    filteredProducts = filteredProducts.filter((product) =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
+
+  const productsToDisplay = limit ? filteredProducts.slice(0, limit) : filteredProducts;
+
+  const hasResults = productsToDisplay.length > 0;
+  const isFiltering = !!searchQuery || !!categoryQuery;
+  const pageTitle = isFiltering ? `Résultats de la recherche` : 'Produits populaires';
 
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold font-headline">{isFiltering ? `Résultats pour "${searchQuery}"` : 'Produits populaires'}</h2>
+        <h2 className="text-2xl font-bold font-headline">{pageTitle}</h2>
         {!isFiltering && (
             <Link href="/dashboard/marketplace" passHref>
                 <Button variant="ghost">
@@ -34,7 +51,7 @@ export default function Marketplace({ searchQuery }: { searchQuery?: string | nu
 
       {hasResults ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredProducts.map(product => (
+          {productsToDisplay.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
