@@ -11,6 +11,7 @@ import { Terminal } from 'lucide-react';
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TransactionsPage from './dashboard/transactions/page';
+import VendorSpace from '@/components/vendor-space';
 
 export default function DashboardPage() {
   const [userName, setUserName] = React.useState<string | null>(null);
@@ -44,10 +45,11 @@ export default function DashboardPage() {
       </div>
 
        <Tabs defaultValue="overview">
-        <TabsList>
+        <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="overview">Aperçu</TabsTrigger>
           <TabsTrigger value="marketplace">Marché</TabsTrigger>
           <TabsTrigger value="transactions">Transactions</TabsTrigger>
+          <TabsTrigger value="vendor">Espace Vendeur</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -66,6 +68,9 @@ export default function DashboardPage() {
         </TabsContent>
         <TabsContent value="transactions" className="mt-6">
             <TransactionsPage />
+        </TabsContent>
+        <TabsContent value="vendor" className="mt-6">
+            <VendorSpace />
         </TabsContent>
       </Tabs>
     </div>
