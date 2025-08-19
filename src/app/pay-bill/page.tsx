@@ -13,7 +13,7 @@ export default function PayBillPage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center gap-4">
-        <Button variant="outline" size="icon" onClick={() => router.back()}>
+        <Button variant="outline" size="icon" onClick={() => router.push('/')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>

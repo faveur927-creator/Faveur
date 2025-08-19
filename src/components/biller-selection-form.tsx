@@ -13,18 +13,17 @@ import { Lightbulb, Droplet, Wifi, Tv, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const billers = [
-    { id: 'E2C', name: 'Électricité (E²C)', icon: Lightbulb },
-    { id: 'LCE', name: 'Eau (LCE)', icon: Droplet },
+    { id: 'CIE', name: 'Électricité (CIE)', icon: Lightbulb },
+    { id: 'SODECI', name: 'Eau (SODECI)', icon: Droplet },
     { 
         id: 'Internet', 
-        name: 'Internet (Liquid Telecom, MTN, Airtel, CanalBox…)', 
+        name: 'Internet (MTN, Orange, Moov…)', 
         icon: Wifi,
         providers: [
-            { id: 'Liquid', name: 'Liquid Telecom' },
             { id: 'MTN_Internet', name: 'MTN' },
-            { id: 'Airtel_Internet', name: 'Airtel' },
+            { id: 'Orange_Internet', name: 'Orange' },
+            { id: 'Moov_Internet', name: 'Moov' },
             { id: 'CanalBox', name: 'CanalBox' },
-            { id: 'CongoTelecom', name: 'Congo Telecom' }
         ]
     },
     { 
@@ -34,15 +33,6 @@ const billers = [
         providers: [
             { id: 'CanalPlus', name: 'Canal+' },
             { id: 'Startimes', name: 'Startimes' }
-        ]
-    },
-    { 
-        id: 'Telephone', 
-        name: 'Téléphone / Data (MTN, Airtel…)', 
-        icon: Smartphone,
-        providers: [
-            { id: 'MTN_Mobile', name: 'MTN' },
-            { id: 'Airtel_Mobile', name: 'Airtel' }
         ]
     },
 ];
@@ -79,7 +69,7 @@ export default function BillerSelectionForm() {
     if (step === 3 && selectedBiller?.providers) {
         setStep(2);
         setSelectedProvider(null);
-    } else {
+    } else if (step === 2 || (step === 3 && !selectedBiller?.providers)) {
         setStep(1);
         setSelectedBiller(null);
         setSelectedProvider(null);
@@ -122,20 +112,20 @@ export default function BillerSelectionForm() {
 
     toast({
       title: "Paiement réussi (Simulation)",
-      description: `Votre facture de ${paymentAmount.toLocaleString('fr-FR')} FCFA pour ${selectedProvider?.name} a été payée via ${paymentMethod}.`,
+      description: `Votre facture de ${paymentAmount.toLocaleString('fr-FR')} FCFA pour ${selectedProvider?.name} a été payée.`,
     });
 
-    router.push('/dashboard');
+    router.push('/');
   };
 
   if (step === 1) {
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Sélection de service</CardTitle>
-          <CardDescription>Sélectionnez le type de facture que vous souhaitez payer.</CardDescription>
+          <CardTitle>Sélection du service</CardTitle>
+          <CardDescription>Choisissez le type de facture que vous souhaitez payer.</CardDescription>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <CardContent className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {billers.map((biller) => (
             <button
               key={biller.id}
@@ -155,10 +145,17 @@ export default function BillerSelectionForm() {
     return (
         <Card className="w-full">
             <CardHeader>
-                <CardTitle>Sélectionnez le fournisseur</CardTitle>
-                <CardDescription>Vous payez une facture pour {selectedBiller.name}.</CardDescription>
+                 <div className="flex items-center gap-4 mb-4">
+                    <Button variant="outline" size="icon" onClick={handleBack}>
+                        &larr;
+                    </Button>
+                    <div>
+                        <CardTitle>Sélectionnez le fournisseur</CardTitle>
+                        <CardDescription>Vous payez une facture pour {selectedBiller.name}.</CardDescription>
+                    </div>
+                </div>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <CardContent className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {selectedBiller.providers.map((provider) => (
                     <button
                         key={provider.id}
@@ -177,13 +174,13 @@ export default function BillerSelectionForm() {
   return (
     <Card className="max-w-2xl mx-auto w-full">
       <CardHeader>
-        <CardTitle>Payer votre facture {selectedProvider?.name}</CardTitle>
+        <CardTitle>Payer votre facture : {selectedProvider?.name}</CardTitle>
         <CardDescription>Veuillez remplir les détails ci-dessous.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="invoice-number">Numéro de facture ou Identifiant</Label>
+            <Label htmlFor="invoice-number">Numéro de facture ou identifiant client</Label>
             <Input
               id="invoice-number"
               placeholder="Entrez la référence de la facture"
@@ -193,7 +190,7 @@ export default function BillerSelectionForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="amount">Montant (FCFA)</Label>
+            <Label htmlFor="amount">Montant à payer (FCFA)</Label>
             <Input
               id="amount"
               type="number"
@@ -216,12 +213,8 @@ export default function BillerSelectionForm() {
                     Wallet Interne
                   </Label>
                   <Label className="flex items-center gap-2 border rounded-lg p-3 w-full sm:w-auto flex-grow cursor-pointer hover:bg-accent has-[:checked]:bg-primary has-[:checked]:text-primary-foreground has-[:checked]:border-primary">
-                    <RadioGroupItem value="mtn_mobile_money" id="mtn_mobile_money" />
-                    MTN Mobile Money
-                  </Label>
-                   <Label className="flex items-center gap-2 border rounded-lg p-3 w-full sm:w-auto flex-grow cursor-pointer hover:bg-accent has-[:checked]:bg-primary has-[:checked]:text-primary-foreground has-[:checked]:border-primary">
-                    <RadioGroupItem value="airtel_mobile_money" id="airtel_mobile_money" />
-                    Airtel Mobile Money
+                    <RadioGroupItem value="mobile_money" id="mobile_money" />
+                    Mobile Money
                   </Label>
                    <Label className="flex items-center gap-2 border rounded-lg p-3 w-full sm:w-auto flex-grow cursor-pointer hover:bg-accent has-[:checked]:bg-primary has-[:checked]:text-primary-foreground has-[:checked]:border-primary">
                     <RadioGroupItem value="card" id="card" />
@@ -229,7 +222,7 @@ export default function BillerSelectionForm() {
                   </Label>
                 </RadioGroup>
             </div>
-          <div className="flex flex-col-reverse sm:flex-row gap-2">
+          <div className="flex flex-col-reverse sm:flex-row gap-2 pt-4">
              <Button type="button" variant="outline" onClick={handleBack} className="w-full sm:w-auto">
                 Retour
               </Button>
