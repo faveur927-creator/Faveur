@@ -24,6 +24,8 @@ function MarketplaceContent() {
   const categories = [...new Set(products.map(p => p.category))];
 
   const handleCategoryFilter = (category: string) => {
+    // If the same category button is clicked again, we remove the filter.
+    // Otherwise, we set the new category filter.
     const newQuery = createQueryString('category', category === categoryQuery ? '' : category);
     router.replace(`${pathname}?${newQuery}`, { scroll: false });
   };
