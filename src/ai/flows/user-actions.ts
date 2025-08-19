@@ -17,8 +17,9 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import prisma from '@/lib/prisma';
-import bcrypt from 'bcryptjs';
+
+// In-memory user store for demonstration
+const users: any[] = [];
 
 // Schema for user registration
 const RegisterUserInputSchema = z.object({
@@ -46,23 +47,20 @@ const registerUserFlow = ai.defineFlow(
   },
   async ({ name, email, password }) => {
     try {
-      const existingUser = await prisma.user.findUnique({
-        where: { email },
-      });
+      const existingUser = users.find(user => user.email === email);
 
       if (existingUser) {
         return { error: "Un utilisateur avec cet e-mail existe déjà." };
       }
+      
+      const newUser = {
+        id: `user_${Date.now()}`,
+        name,
+        email,
+        password, // In a real app, hash this!
+      };
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      const newUser = await prisma.user.create({
-        data: {
-          name,
-          email,
-          hashedPassword,
-        },
-      });
+      users.push(newUser);
 
       return { userId: newUser.id };
     } catch (e) {
@@ -99,19 +97,13 @@ const loginUserFlow = ai.defineFlow(
     },
     async ({ email, password }) => {
         try {
-            const user = await prisma.user.findUnique({
-                where: { email },
-            });
+            const user = users.find(u => u.email === email);
 
             if (!user) {
                 return { error: "L'e-mail ou le mot de passe est incorrect." };
             }
 
-            if (!user.hashedPassword) {
-              return { error: "Le compte n'a pas de mot de passe configuré." };
-            }
-
-            const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
+            const isPasswordValid = user.password === password;
 
             if (!isPasswordValid) {
                 return { error: "L'e-mail ou le mot de passe est incorrect." };
@@ -152,19 +144,16 @@ const getUserDataFlow = ai.defineFlow(
     },
     async ({ userId }) => {
         try {
-            const user = await prisma.user.findUnique({
-                where: { id: userId }
-            });
+            const user = users.find(u => u.id === userId);
 
             if (!user) {
                 return { error: "Utilisateur non trouvé." };
             }
             
-            // Returning mock data as Account model is removed for now
             return {
                 name: user.name,
                 email: user.email,
-                balance: 0,
+                balance: 123456.78, // Mock balance
                 currency: 'FCFA',
             };
         } catch (e) {
