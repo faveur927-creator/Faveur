@@ -16,13 +16,21 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import React from 'react';
 
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { toast } = useToast();
   
-  const product = products.find(p => p.id === params.id);
+  // Use React.use to unwrap the Promise-like params object
+  const safeParams = React.use(
+    new Promise<{ id: string }>((resolve) => {
+      resolve(params);
+    })
+  );
+
+  const product = products.find(p => p.id === safeParams.id);
 
   if (!product) {
     notFound();
@@ -114,6 +122,11 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               
               <p className="text-4xl font-bold font-headline text-primary">{product.price.toLocaleString('fr-FR')} FCFA</p>
               
+               <div>
+                <h3 className="font-semibold mb-2">Vendu par :</h3>
+                <p className="text-muted-foreground">{product.vendeur}</p>
+              </div>
+
               <div>
                 <h3 className="font-semibold mb-2">Description</h3>
                 <p className="text-muted-foreground">{product.description}</p>
