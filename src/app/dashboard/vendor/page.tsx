@@ -14,6 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import Link from 'next/link';
 
 
 export default function VendorPage() {
@@ -24,18 +25,20 @@ export default function VendorPage() {
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold font-headline tracking-tight">Espace Vendeur</h1>
-          <p className="text-muted-foreground">Gérez vos produits et consultez vos ventes.</p>
+          <h1 className="text-3xl font-bold font-headline tracking-tight">Mes Produits</h1>
+          <p className="text-muted-foreground">Gérez les produits de votre boutique.</p>
         </div>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Ajouter un produit
+        <Button asChild>
+          <Link href="/dashboard/vendor/add-product">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Ajouter un produit
+          </Link>
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Mes Produits</CardTitle>
+          <CardTitle>Liste des produits</CardTitle>
           <CardDescription>La liste de tous les produits que vous avez mis en vente.</CardDescription>
         </CardHeader>
         <CardContent>
