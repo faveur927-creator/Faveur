@@ -35,7 +35,7 @@ export async function getAirtelToken() {
  */
 export async function requestToPayAirtel(amount: string, phoneNumber: string) {
   const token = await getAirtelToken();
-  const transactionId = `TXN_${Date.now()}`; // identifiant unique
+  const transactionId = `T${Date.now()}${Math.floor(Math.random() * 1000)}`; // identifiant unique
 
   try {
     const res = await axios.post(
@@ -45,7 +45,7 @@ export async function requestToPayAirtel(amount: string, phoneNumber: string) {
         subscriber: {
           country: COUNTRY,
           currency: CURRENCY,
-          msisdn: phoneNumber, // numéro client format international (ex: 24206xxxxxx)
+          msisdn: phoneNumber.replace('+', ''), // le numéro client ne doit pas avoir de '+'
         },
         transaction: {
           amount,
@@ -64,10 +64,12 @@ export async function requestToPayAirtel(amount: string, phoneNumber: string) {
       }
     );
 
+    // Retourne l'ID de transaction pour le suivi
     return { status: res.status, transactionId, responseData: res.data };
   } catch (error: any) {
     console.error("Erreur de demande de paiement Airtel:", error.response?.data || error.message);
-    throw new Error("Impossible d'initier le paiement Airtel.");
+    // Transmettre l'erreur pour une meilleure gestion
+    throw new Error(error.response?.data?.message || "Impossible d'initier le paiement Airtel.");
   }
 }
 
@@ -93,6 +95,6 @@ export async function checkAirtelTransaction(transactionId: string) {
     return res.data; // contient transaction.status : SUCCESSFUL | FAILED | PENDING
   } catch (error: any) {
     console.error("Erreur de vérification de transaction Airtel:", error.response?.data || error.message);
-    throw new Error("Impossible de vérifier la transaction Airtel.");
+    throw new Error(error.response?.data?.message || "Impossible de vérifier la transaction Airtel.");
   }
 }

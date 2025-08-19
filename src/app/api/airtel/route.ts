@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     console.error("Erreur API de paiement Airtel (POST):", error.message);
-    return NextResponse.json({ error: "Une erreur est survenue lors de l'initiation du paiement Airtel." }, { status: 500 });
+    return NextResponse.json({ error: `Une erreur est survenue lors de l'initiation du paiement Airtel: ${error.message}` }, { status: 500 });
   }
 }
 
@@ -39,6 +39,6 @@ export async function GET(req: Request) {
     return NextResponse.json(status);
   } catch (error: any) {
     console.error("Erreur API de paiement Airtel (GET):", error.message);
-    return NextResponse.json({ error: "Une erreur est survenue lors de la vérification du statut." }, { status: 500 });
+    return NextResponse.json({ error: `Une erreur est survenue lors de la vérification du statut: ${error.message}` }, { status: 500 });
   }
 }
