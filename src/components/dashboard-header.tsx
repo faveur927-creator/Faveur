@@ -7,11 +7,29 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useCallback } from 'react';
+
 
 export default function DashboardHeader() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set(name, value)
+ 
+      return params.toString()
+    },
+    [searchParams]
+  )
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    router.push(pathname + '?' + createQueryString('q', e.target.value))
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('userName');
@@ -30,6 +48,8 @@ export default function DashboardHeader() {
           type="search"
           placeholder="Rechercher des produits..."
           className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
+          onChange={handleSearch}
+          defaultValue={searchParams.get('q') || ''}
         />
       </div>
       <div className="flex items-center gap-2">

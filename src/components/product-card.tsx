@@ -11,6 +11,7 @@ type Product = {
   image: string;
   dataAiHint: string;
   stock: number;
+  category: string;
 };
 
 export default function ProductCard({ product }: { product: Product }) {

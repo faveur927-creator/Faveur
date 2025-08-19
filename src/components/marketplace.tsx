@@ -1,43 +1,17 @@
 import ProductCard from '@/components/product-card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { products } from '@/lib/products';
 
-const products = [
-  {
-    id: '1',
-    name: 'Casque sans fil Premium',
-    price: 90000,
-    image: 'https://placehold.co/600x400.png',
-    dataAiHint: 'headphones music',
-    stock: 24,
-  },
-  {
-    id: '2',
-    name: 'Tracker d\'Activité Intelligent',
-    price: 54000,
-    image: 'https://placehold.co/600x400.png',
-    dataAiHint: 'smart watch',
-    stock: 50,
-  },
-  {
-    id: '3',
-    name: 'Machine à Café Portable',
-    price: 39000,
-    image: 'https://placehold.co/600x400.png',
-    dataAiHint: 'coffee maker',
-    stock: 15,
-  },
-  {
-    id: '4',
-    name: 'Chaise de Bureau Ergonomique',
-    price: 180000,
-    image: 'https://placehold.co/600x400.png',
-    dataAiHint: 'office chair',
-    stock: 8,
-  }
-];
 
-export default function Marketplace() {
+export default function Marketplace({ searchQuery }: { searchQuery?: string }) {
+
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchQuery?.toLowerCase() || '') ||
+    product.category.toLowerCase().includes(searchQuery?.toLowerCase() || '')
+  );
+
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -47,7 +21,7 @@ export default function Marketplace() {
         </Button>
       </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {products.map(product => (
+        {filteredProducts.map(product => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>

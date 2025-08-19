@@ -8,8 +8,6 @@ import ExpensesChart from '@/components/expenses-chart';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
 import React from 'react';
-import DashboardHeader from '@/components/dashboard-header';
-import { Sidebar, SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import DashboardLayout from './dashboard/layout';
 
 export default function App() {
