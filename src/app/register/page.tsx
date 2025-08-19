@@ -18,7 +18,6 @@ import OtpForm from '@/components/otp-form';
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères." }),
   email: z.string().email({ message: "L'adresse e-mail n'est pas valide." }),
-  phone: z.string().min(9, { message: "Le numéro de téléphone doit contenir au moins 9 chiffres."}),
   password: z.string().min(8, { message: "Le mot de passe doit contenir au moins 8 caractères." }),
 });
 
@@ -34,7 +33,6 @@ export default function RegisterPage() {
     defaultValues: {
       name: "",
       email: "",
-      phone: "",
       password: "",
     },
   });
@@ -43,7 +41,7 @@ export default function RegisterPage() {
 
   const handleRegistrationSubmit = async (values: z.infer<typeof registerSchema>) => {
     try {
-      const otpResult = await sendOtp({ phone: values.phone });
+      const otpResult = await sendOtp({ email: values.email });
 
       if (otpResult.otp) {
         toast({
@@ -126,12 +124,12 @@ export default function RegisterPage() {
             <Logo />
           </div>
           <CardTitle className="text-2xl font-headline">
-            {step === 'register' ? 'Créer un compte' : 'Vérifiez votre numéro'}
+            {step === 'register' ? 'Créer un compte' : 'Vérifiez votre e-mail'}
           </CardTitle>
           <CardDescription>
             {step === 'register'
               ? 'Entrez vos informations pour créer un nouveau compte'
-              : `Nous avons envoyé un code à 6 chiffres au ${form.getValues().phone}`}
+              : `Nous avons envoyé un code à 6 chiffres à ${form.getValues().email}`}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -159,19 +157,6 @@ export default function RegisterPage() {
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input placeholder="m@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Téléphone</FormLabel>
-                      <FormControl>
-                        <Input placeholder="+221 77 123 45 67" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -209,7 +194,7 @@ export default function RegisterPage() {
               </>
             ) : (
               <Button variant="link" onClick={() => setStep('register')} className="p-0 h-auto">
-                Modifier le numéro de téléphone?
+                Modifier l'adresse e-mail?
               </Button>
             )}
           </div>

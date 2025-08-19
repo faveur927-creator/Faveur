@@ -176,7 +176,7 @@ const getUserDataFlow = ai.defineFlow(
 
 // Schema for sending OTP
 const SendOtpInputSchema = z.object({
-  phone: z.string(),
+  email: z.string().email(),
 });
 export type SendOtpInput = z.infer<typeof SendOtpInputSchema>;
 
@@ -196,12 +196,12 @@ const sendOtpFlow = ai.defineFlow(
     inputSchema: SendOtpInputSchema,
     outputSchema: SendOtpOutputSchema,
   },
-  async ({ phone }) => {
+  async ({ email }) => {
     try {
-      // In a real app, you would integrate with an SMS gateway like Twilio here.
+      // In a real app, you would integrate with an email service like SendGrid here.
       // For this simulation, we'll just generate a random 6-digit code.
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      console.log(`OTP for ${phone} is: ${otp}`); // Log for debugging
+      console.log(`OTP for ${email} is: ${otp}`); // Log for debugging
 
       // We return the OTP so the frontend can display it for testing.
       // In a real app, you would not return the OTP.
