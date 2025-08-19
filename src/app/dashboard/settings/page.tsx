@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ArrowUpRight, ArrowDownLeft, FileCheck, Upload } from 'lucide-react';
+import { ArrowUpRight, ArrowDownLeft, FileCheck, Upload, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 
@@ -118,7 +118,7 @@ export default function SettingsPage() {
         if (res.ok) {
             toast({
                 title: "KYC soumis avec succès",
-                description: `Votre CNI n. ${data.numeroCNI} a été envoyée pour vérification.`,
+                description: `${data.message}`,
             });
             setRecto(null);
             setVerso(null);
@@ -129,7 +129,7 @@ export default function SettingsPage() {
     } catch (error: any) {
         toast({
             variant: 'destructive',
-            title: "Erreur de téléversement",
+            title: "Erreur de vérification",
             description: error.message,
         });
     } finally {
@@ -168,7 +168,7 @@ export default function SettingsPage() {
                               accept="image/png, image/jpeg"
                               className="hidden"
                             />
-                            <Button variant="link" size="sm" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                            <Button variant="link" size="sm" type="button" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
                                 {isUploading ? 'Chargement...' : 'Changer de photo'}
                             </Button>
                         </div>
@@ -239,12 +239,12 @@ export default function SettingsPage() {
                             </div>
                         )}
 
-                        <p className="text-sm text-muted-foreground">
-                            Téléchargez des images claires (JPG, PNG) de votre pièce d'identité.
+                        <p className="text-xs text-muted-foreground">
+                            Téléchargez des images claires (JPG, PNG) de votre pièce d'identité. Max 5MB.
                         </p>
                         <Button type="submit" className="w-full" disabled={isUploading || !isKycFormSubmittable}>
-                            <Upload className="mr-2 h-4 w-4"/>
-                            {isUploading ? "Envoi en cours..." : "Lancer la vérification"}
+                            {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Upload className="mr-2 h-4 w-4"/>}
+                            {isUploading ? "Vérification en cours..." : "Lancer la vérification"}
                         </Button>
                     </CardContent>
                  </form>
