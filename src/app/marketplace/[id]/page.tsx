@@ -23,14 +23,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const router = useRouter();
   const { toast } = useToast();
   
-  // Use React.use to unwrap the Promise-like params object
-  const safeParams = React.use(
-    new Promise<{ id: string }>((resolve) => {
-      resolve(params);
-    })
-  );
-
-  const product = products.find(p => p.id === safeParams.id);
+  const product = products.find(p => p.id === params.id);
 
   if (!product) {
     notFound();
