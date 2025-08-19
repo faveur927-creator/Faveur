@@ -95,7 +95,7 @@ export default function RootLayout({
                   <SidebarGroup>
                       <SidebarGroupLabel>Espace Vendeur</SidebarGroupLabel>
                       <SidebarMenuItem>
-                          <SidebarMenuButton asChild isActive={pathname.includes('?tab=vendor') && usePathname().includes('dashboard')}>
+                          <SidebarMenuButton asChild isActive={pathname.includes('?tab=vendor')}>
                             <Link href="/?tab=vendor">
                               <LayoutGrid />
                               Aperçu
