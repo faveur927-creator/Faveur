@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     });
   } catch (error: any) {
     console.error("Erreur API de paiement (POST):", error.response?.data || error.message);
-    return NextResponse.json({ error: "Une erreur est survenue lors de l'initiation du paiement.", details: error.response?.data?.message || error.message }, { status: 500 });
+    return NextResponse.json({ error: `Une erreur est survenue lors de l'initiation du paiement: ${error.message}`, details: error.response?.data?.message || error.message }, { status: 500 });
   }
 }
 
@@ -38,6 +38,6 @@ export async function GET(req: Request) {
     return NextResponse.json(status);
   } catch (error: any) {
     console.error("Erreur API de paiement (GET):", error.response?.data || error.message);
-    return NextResponse.json({ error: "Une erreur est survenue lors de la vérification du statut.", details: error.response?.data?.message || error.message }, { status: 500 });
+    return NextResponse.json({ error: `Une erreur est survenue lors de la vérification du statut: ${error.message}`, details: error.response?.data?.message || error.message }, { status: 500 });
   }
 }

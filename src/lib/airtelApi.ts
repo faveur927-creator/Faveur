@@ -12,17 +12,16 @@ const CURRENCY = "XAF"; // ou "CDF" selon pays
  */
 export async function getAirtelToken() {
   try {
-    const params = new URLSearchParams();
-    params.append('client_id', CLIENT_ID);
-    params.append('client_secret', CLIENT_SECRET);
-    params.append('grant_type', 'client_credentials');
-
     const res = await axios.post(
       `${BASE_URL}/auth/oauth2/token`,
-      params,
+      {
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        grant_type: "client_credentials",
+      },
       {
         headers: { 
-          "Content-Type": "application/x-www-form-urlencoded",
+          'Content-Type': 'application/json'
         },
       }
     );

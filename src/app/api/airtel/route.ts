@@ -18,7 +18,7 @@ export async function POST(req: Request) {
       transactionId,
     });
 
-  } catch (error: any) {
+  } catch (error: any {
     console.error("Erreur API de paiement Airtel (POST):", error.message);
     return NextResponse.json({ error: `Une erreur est survenue lors de l'initiation du paiement Airtel: ${error.message}` }, { status: 500 });
   }
