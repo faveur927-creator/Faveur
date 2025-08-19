@@ -26,7 +26,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <SidebarMenu>
               <SidebarMenuItem>
                 <Link href="/dashboard">
-                  <SidebarMenuButton isActive>
+                  <SidebarMenuButton>
                     <Home />
                     Tableau de bord
                   </SidebarMenuButton>
@@ -61,7 +61,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <SidebarFooter>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Link href="#">
+                <Link href="/dashboard/settings">
                   <SidebarMenuButton>
                     <Settings />
                     Paramètres
