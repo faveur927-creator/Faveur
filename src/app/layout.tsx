@@ -67,8 +67,8 @@ export default function RootLayout({
                           </SidebarMenuButton>
                       </SidebarMenuItem>
                       <SidebarMenuItem>
-                        <SidebarMenuButton asChild isActive={pathname === '/dashboard/transactions'}>
-                          <Link href="/dashboard/transactions">
+                        <SidebarMenuButton asChild isActive={pathname.includes('?tab=transactions')}>
+                          <Link href="/?tab=transactions">
                             <Wallet />
                             Transactions
                           </Link>

@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import BalanceCard from '@/components/balance-card';
@@ -8,14 +9,18 @@ import RecentTransactions from '@/components/recent-transactions';
 import ExpensesChart from '@/components/expenses-chart';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TransactionsPage from './dashboard/transactions/page';
 import VendorSpace from '@/components/vendor-space';
+import { useSearchParams } from 'next/navigation';
 
-export default function DashboardPage() {
+function DashboardContent() {
   const [userName, setUserName] = React.useState<string | null>(null);
   const [userId, setUserId] = React.useState<string | null>(null);
+  
+  const searchParams = useSearchParams();
+  const defaultTab = searchParams.get('tab') || 'overview';
 
   React.useEffect(() => {
     // Simulate login
@@ -44,7 +49,7 @@ export default function DashboardPage() {
         </Alert>
       </div>
 
-       <Tabs defaultValue="overview">
+       <Tabs defaultValue={defaultTab} key={defaultTab}>
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="overview">Aperçu</TabsTrigger>
           <TabsTrigger value="marketplace">Marché</TabsTrigger>
@@ -75,4 +80,13 @@ export default function DashboardPage() {
       </Tabs>
     </div>
   );
+}
+
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <DashboardContent />
+    </Suspense>
+  )
 }
