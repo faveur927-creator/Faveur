@@ -37,6 +37,9 @@ export default function RootLayout({
 }>) {
 
   const pathname = usePathname();
+  const noLayoutPages = ['/login', '/register'];
+  const showLayout = !noLayoutPages.includes(pathname);
+
 
   return (
     <html lang="fr" suppressHydrationWarning>
@@ -48,125 +51,131 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <SidebarProvider>
-          <div className="min-h-screen w-full bg-background">
-            <Sidebar>
-              <SidebarHeader>
-                <Logo />
-              </SidebarHeader>
-              <SidebarContent>
-                <SidebarMenu>
-                  <SidebarGroup>
-                    <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
-                      <SidebarMenuItem>
-                          <SidebarMenuButton asChild isActive={pathname === '/' && !usePathname().includes('?')}>
-                            <Link href="/">
-                              <Home />
-                              Tableau de bord
+        {showLayout ? (
+          <SidebarProvider>
+            <div className="min-h-screen w-full bg-background">
+              <Sidebar>
+                <SidebarHeader>
+                  <Logo />
+                </SidebarHeader>
+                <SidebarContent>
+                  <SidebarMenu>
+                    <SidebarGroup>
+                      <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname === '/' && !usePathname().includes('?')}>
+                              <Link href="/">
+                                <Home />
+                                Tableau de bord
+                              </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                          <SidebarMenuButton asChild isActive={pathname.includes('?tab=transactions')}>
+                            <Link href="/?tab=transactions">
+                              <Wallet />
+                              Transactions
                             </Link>
                           </SidebarMenuButton>
-                      </SidebarMenuItem>
-                      <SidebarMenuItem>
-                        <SidebarMenuButton asChild isActive={pathname.includes('?tab=transactions')}>
-                          <Link href="/?tab=transactions">
-                            <Wallet />
-                            Transactions
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                      <SidebarMenuItem>
-                        <SidebarMenuButton asChild isActive={pathname.includes('?tab=marketplace')}>
-                           <Link href="/?tab=marketplace">
-                            <ShoppingCart />
-                            Marché
-                           </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                       <SidebarMenuItem>
-                        <SidebarMenuButton>
-                          <Bell />
-                          Notifications
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                  </SidebarGroup>
-                  
-                  <SidebarSeparator />
-                  
-                  <SidebarGroup>
-                      <SidebarGroupLabel>Espace Vendeur</SidebarGroupLabel>
-                      <SidebarMenuItem>
-                          <SidebarMenuButton asChild isActive={pathname.includes('?tab=vendor')}>
-                            <Link href="/?tab=vendor">
-                              <LayoutGrid />
-                              Aperçu
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                          <SidebarMenuButton asChild isActive={pathname.includes('?tab=marketplace')}>
+                            <Link href="/?tab=marketplace">
+                              <ShoppingCart />
+                              Marché
                             </Link>
                           </SidebarMenuButton>
-                      </SidebarMenuItem>
-                       <SidebarMenuItem>
-                          <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/vendor/products') || pathname.startsWith('/dashboard/vendor/add-product')}>
-                            <Link href="/dashboard/vendor/products">
-                              <Package />
-                              Produits
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                          <SidebarMenuButton>
+                            <Bell />
+                            Notifications
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarGroup>
+                    
+                    <SidebarSeparator />
+                    
+                    <SidebarGroup>
+                        <SidebarGroupLabel>Espace Vendeur</SidebarGroupLabel>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname.includes('?tab=vendor')}>
+                              <Link href="/?tab=vendor">
+                                <LayoutGrid />
+                                Aperçu
+                              </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/vendor/products') || pathname.startsWith('/dashboard/vendor/add-product')}>
+                              <Link href="/dashboard/vendor/products">
+                                <Package />
+                                Produits
+                              </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname === '/dashboard/vendor/orders'}>
+                              <Link href="/dashboard/vendor/orders">
+                                <Truck />
+                                Commandes
+                              </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                          <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/vendor/transactions')}>
+                            <Link href="/dashboard/vendor/transactions">
+                              <ArrowRightLeft />
+                              Transactions
                             </Link>
                           </SidebarMenuButton>
-                      </SidebarMenuItem>
-                      <SidebarMenuItem>
-                          <SidebarMenuButton asChild isActive={pathname === '/dashboard/vendor/orders'}>
-                            <Link href="/dashboard/vendor/orders">
-                              <Truck />
-                              Commandes
-                            </Link>
-                          </SidebarMenuButton>
-                      </SidebarMenuItem>
-                      <SidebarMenuItem>
-                        <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/vendor/transactions')}>
-                          <Link href="/dashboard/vendor/transactions">
-                            <ArrowRightLeft />
-                            Transactions
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                      <SidebarMenuItem>
-                          <SidebarMenuButton asChild isActive={pathname === '/dashboard/vendor/analytics'}>
-                            <Link href="/dashboard/vendor/analytics">
-                              <BarChart />
-                              Analyses
-                            </Link>
-                          </SidebarMenuButton>
-                      </SidebarMenuItem>
-                       <SidebarMenuItem>
-                          <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/vendor/settings')}>
-                            <Link href="/dashboard/vendor/settings">
-                              <Store />
-                              Paramètres Boutique
-                            </Link>
-                          </SidebarMenuButton>
-                      </SidebarMenuItem>
-                  </SidebarGroup>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname === '/dashboard/vendor/analytics'}>
+                              <Link href="/dashboard/vendor/analytics">
+                                <BarChart />
+                                Analyses
+                              </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/vendor/settings')}>
+                              <Link href="/dashboard/vendor/settings">
+                                <Store />
+                                Paramètres Boutique
+                              </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarGroup>
 
-                </SidebarMenu>
-              </SidebarContent>
-              <SidebarFooter>
-                <SidebarMenu>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/settings')}>
-                      <Link href="/dashboard/settings">
-                        <Settings />
-                        Paramètres Compte
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarFooter>
-            </Sidebar>
-            <main className="flex-1 md:ml-[16rem]">
-              <DashboardHeader />
-              <div className="p-4 sm:p-6 lg:p-8">
-                {children}
-              </div>
-            </main>
-          </div>
-        </SidebarProvider>
+                  </SidebarMenu>
+                </SidebarContent>
+                <SidebarFooter>
+                  <SidebarMenu>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/settings')}>
+                        <Link href="/dashboard/settings">
+                          <Settings />
+                          Paramètres Compte
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </SidebarMenu>
+                </SidebarFooter>
+              </Sidebar>
+              <main className="flex-1 md:ml-[16rem]">
+                <DashboardHeader />
+                <div className="p-4 sm:p-6 lg:p-8">
+                  {children}
+                </div>
+              </main>
+            </div>
+          </SidebarProvider>
+        ) : (
+          <>
+            {children}
+          </>
+        )}
         <Toaster />
       </body>
     </html>

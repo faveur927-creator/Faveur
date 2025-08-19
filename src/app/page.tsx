@@ -13,9 +13,10 @@ import React, { Suspense } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TransactionsPage from './dashboard/transactions/page';
 import VendorSpace from '@/components/vendor-space';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 function DashboardContent() {
+  const router = useRouter();
   const [userName, setUserName] = React.useState<string | null>(null);
   const [userId, setUserId] = React.useState<string | null>(null);
   
@@ -23,15 +24,20 @@ function DashboardContent() {
   const defaultTab = searchParams.get('tab') || 'overview';
 
   React.useEffect(() => {
-    // Simulate login
-    const name = "Utilisateur Démo";
-    const id = "user_demo_123";
-    localStorage.setItem('userName', name);
-    localStorage.setItem('userId', id);
-    localStorage.setItem('userEmail', "demo@superapp.com");
-    setUserName(name);
-    setUserId(id);
-  }, []);
+    const storedUserId = localStorage.getItem('userId');
+    if (!storedUserId) {
+      router.push('/login');
+    } else {
+      const storedUserName = localStorage.getItem('userName');
+      setUserId(storedUserId);
+      setUserName(storedUserName);
+    }
+  }, [router]);
+  
+  if (!userId) {
+    // Render a loading state or nothing while redirecting
+    return <div>Chargement...</div>;
+  }
 
   return (
     <div className="flex flex-col gap-6">
