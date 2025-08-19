@@ -15,16 +15,45 @@ import { cn } from '@/lib/utils';
 const billers = [
     { id: 'E2C', name: 'Électricité (E²C)', icon: Lightbulb },
     { id: 'LCE', name: 'Eau (LCE)', icon: Droplet },
-    { id: 'Internet', name: 'Internet (Liquid Telecom, MTN, Airtel, CanalBox…)', icon: Wifi },
-    { id: 'TV', name: 'TV (Canal+, Startimes…)', icon: Tv },
-    { id: 'Telephone', name: 'Téléphone / Data (MTN, Airtel…)', icon: Smartphone },
+    { 
+        id: 'Internet', 
+        name: 'Internet (Liquid Telecom, MTN, Airtel, CanalBox…)', 
+        icon: Wifi,
+        providers: [
+            { id: 'Liquid', name: 'Liquid Telecom' },
+            { id: 'MTN_Internet', name: 'MTN' },
+            { id: 'Airtel_Internet', name: 'Airtel' },
+            { id: 'CanalBox', name: 'CanalBox' },
+            { id: 'CongoTelecom', name: 'Congo Telecom' }
+        ]
+    },
+    { 
+        id: 'TV', 
+        name: 'TV (Canal+, Startimes…)', 
+        icon: Tv,
+        providers: [
+            { id: 'CanalPlus', name: 'Canal+' },
+            { id: 'Startimes', name: 'Startimes' }
+        ]
+    },
+    { 
+        id: 'Telephone', 
+        name: 'Téléphone / Data (MTN, Airtel…)', 
+        icon: Smartphone,
+        providers: [
+            { id: 'MTN_Mobile', name: 'MTN' },
+            { id: 'Airtel_Mobile', name: 'Airtel' }
+        ]
+    },
 ];
 
-type Biller = typeof billers[0];
+type Provider = { id: string; name: string };
+type Biller = typeof billers[0] & { providers?: Provider[] };
 
 export default function BillerSelectionForm() {
   const [selectedBiller, setSelectedBiller] = useState<Biller | null>(null);
-  const [step, setStep] = useState(1); // 1: Select Biller, 2: Enter Details
+  const [selectedProvider, setSelectedProvider] = useState<Provider | null>(null);
+  const [step, setStep] = useState(1); // 1: Select Biller, 2: Select Provider, 3: Enter Details
   const [amount, setAmount] = useState('');
   const [invoiceId, setInvoiceId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('wallet');
@@ -33,14 +62,30 @@ export default function BillerSelectionForm() {
 
   const handleBillerSelect = (biller: Biller) => {
     setSelectedBiller(biller);
-    setStep(2);
+    if (biller.providers) {
+      setStep(2);
+    } else {
+      setSelectedProvider({ id: biller.id, name: biller.name });
+      setStep(3);
+    }
+  };
+  
+  const handleProviderSelect = (provider: Provider) => {
+    setSelectedProvider(provider);
+    setStep(3);
   };
 
   const handleBack = () => {
-    setStep(1);
-    setSelectedBiller(null);
-    setAmount('');
-    setInvoiceId('');
+    if (step === 3 && selectedBiller?.providers) {
+        setStep(2);
+        setSelectedProvider(null);
+    } else {
+        setStep(1);
+        setSelectedBiller(null);
+        setSelectedProvider(null);
+        setAmount('');
+        setInvoiceId('');
+    }
   };
 
   const handleSubmit = (event: React.FormEvent) => {
@@ -77,7 +122,7 @@ export default function BillerSelectionForm() {
 
     toast({
       title: "Paiement réussi (Simulation)",
-      description: `Votre facture de ${paymentAmount.toLocaleString('fr-FR')} FCFA pour ${selectedBiller?.name} a été payée via ${paymentMethod}.`,
+      description: `Votre facture de ${paymentAmount.toLocaleString('fr-FR')} FCFA pour ${selectedProvider?.name} a été payée via ${paymentMethod}.`,
     });
 
     router.push('/dashboard');
@@ -106,10 +151,33 @@ export default function BillerSelectionForm() {
     );
   }
 
+  if (step === 2 && selectedBiller?.providers) {
+    return (
+        <Card className="w-full">
+            <CardHeader>
+                <CardTitle>Sélectionnez le fournisseur</CardTitle>
+                <CardDescription>Vous payez une facture pour {selectedBiller.name}.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {selectedBiller.providers.map((provider) => (
+                    <button
+                        key={provider.id}
+                        onClick={() => handleProviderSelect(provider)}
+                        className="flex flex-col items-center justify-center gap-2 p-4 border rounded-lg h-32 text-center hover:bg-accent hover:shadow-lg transition-all"
+                    >
+                        <span className="font-semibold text-sm">{provider.name}</span>
+                    </button>
+                ))}
+            </CardContent>
+        </Card>
+    );
+  }
+
+
   return (
     <Card className="max-w-2xl mx-auto w-full">
       <CardHeader>
-        <CardTitle>Payer votre facture {selectedBiller?.name}</CardTitle>
+        <CardTitle>Payer votre facture {selectedProvider?.name}</CardTitle>
         <CardDescription>Veuillez remplir les détails ci-dessous.</CardDescription>
       </CardHeader>
       <CardContent>
@@ -170,4 +238,3 @@ export default function BillerSelectionForm() {
     </Card>
   );
 }
-
