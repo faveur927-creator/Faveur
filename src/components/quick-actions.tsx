@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ReceiptText, Smartphone, ShoppingCart } from "lucide-react";
+import { ReceiptText, Smartphone, ShoppingCart, Package } from "lucide-react";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -16,6 +16,11 @@ const actions = [
     label: "Acheter du crédit",
     icon: Smartphone,
     href: "/dashboard/buy-credit",
+  },
+  {
+    label: "Acheter un forfait",
+    icon: Package,
+    href: "/dashboard/buy-bundle",
   },
   {
     label: "Aller au marché",
@@ -39,16 +44,16 @@ export default function QuickActions() {
       <CardHeader>
         <CardTitle>Actions Rapides</CardTitle>
       </CardHeader>
-      <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <CardContent className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {actions.map((action) => (
            <Button 
             key={action.label} 
             variant="outline" 
-            className="h-20 flex-col gap-2"
+            className="h-24 flex-col gap-2"
             onClick={() => handleActionClick(action.href)}
           >
             <action.icon className="w-6 h-6" />
-            <span>{action.label}</span>
+            <span className="text-center">{action.label}</span>
           </Button>
         ))}
       </CardContent>
