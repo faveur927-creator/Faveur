@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import ProductCard from '@/components/product-card';
@@ -8,6 +9,7 @@ import { products } from '@/lib/products';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQueryParams } from '@/hooks/use-query-params';
+import React from 'react';
 
 interface MarketplaceProps {
   limit?: number;
@@ -26,11 +28,12 @@ export default function Marketplace({ limit }: MarketplaceProps) {
   const categories = [...new Set(products.map(p => p.category))];
 
   const handleCategoryFilter = (category: string) => {
+    // When on the main dashboard, clicking a category should switch to the marketplace tab
+    const newPath = pathname === '/' ? '/?tab=marketplace' : pathname;
     const newQuery = createQueryString('category', category === categoryQuery ? '' : category);
-    const targetPath = pathname === '/' ? '/marketplace' : pathname;
-    router.replace(`${targetPath}?${newQuery}`, { scroll: false });
+    router.replace(`${newPath}&${newQuery}`, { scroll: false });
   };
-
+  
   let filteredProducts = products;
 
   if (categoryQuery) {
@@ -68,7 +71,7 @@ export default function Marketplace({ limit }: MarketplaceProps) {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold font-headline">{getPageTitle()}</h2>
         {limit && (
-            <Link href="/marketplace" passHref>
+            <Link href="/?tab=marketplace" passHref>
                 <Button variant="ghost">
                     Voir tout <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>

@@ -1,4 +1,5 @@
 
+
 import { products } from '@/lib/products';
 import { notFound } from 'next/navigation';
 import ProductDetailClient from '@/components/product-detail-client';

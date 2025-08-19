@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { Search, Bell, ShoppingCart } from 'lucide-react';
@@ -40,17 +41,18 @@ export default function DashboardHeader() {
 
 
   useEffect(() => {
-    const newUrl = `${pathname}?${createQueryString('q', searchQuery)}`;
-    
-    // Si l'utilisateur recherche depuis une autre page que le marché, le rediriger
-    if (searchQuery && pathname !== '/marketplace') {
-      router.push('/marketplace?' + createQueryString('q', searchQuery));
+    // If the user is searching, always direct them to the marketplace tab
+    if (searchQuery) {
+        const newUrl = `/?tab=marketplace&${createQueryString('q', searchQuery)}`;
+        router.replace(newUrl, { scroll: false });
     } else {
-       // Utilise replace pour éviter d'ajouter une entrée dans l'historique pour chaque caractère tapé
-       router.replace(newUrl, { scroll: false });
+        // Clear the search query from the URL when the input is cleared
+        const newUrl = `${pathname}?${createQueryString('q', '')}`;
+        router.replace(newUrl, { scroll: false });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery]);
+  }, [searchQuery, pathname]);
+
 
   // Met à jour la barre de recherche si les paramètres de l'URL changent (ex: navigation arrière/avant)
   useEffect(() => {
@@ -102,7 +104,7 @@ export default function DashboardHeader() {
             <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-                <Link href="/settings">Paramètres</Link>
+                <Link href="/dashboard/settings">Paramètres</Link>
             </DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />
