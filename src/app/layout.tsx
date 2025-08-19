@@ -19,7 +19,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { Home, ShoppingCart, Wallet, Settings, Bell, Store, BarChart, Package, PlusCircle, LayoutGrid, Truck } from 'lucide-react';
+import { Home, ShoppingCart, Wallet, Settings, Bell, Store, BarChart, Package, PlusCircle, LayoutGrid, Truck, ArrowRightLeft } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard-header';
 import Logo from '@/components/logo';
 import { usePathname } from 'next/navigation';
@@ -117,6 +117,14 @@ export default function RootLayout({
                               Commandes
                             </Link>
                           </SidebarMenuButton>
+                      </SidebarMenuItem>
+                      <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/vendor/transactions')}>
+                          <Link href="/dashboard/vendor/transactions">
+                            <ArrowRightLeft />
+                            Transactions
+                          </Link>
+                        </SidebarMenuButton>
                       </SidebarMenuItem>
                       <SidebarMenuItem>
                           <SidebarMenuButton asChild isActive={pathname === '/dashboard/vendor/analytics'}>

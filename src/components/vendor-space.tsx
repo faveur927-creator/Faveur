@@ -6,6 +6,7 @@ import VendorDashboardPage from '@/app/dashboard/vendor/dashboard/page';
 import VendorProductsPage from '@/app/dashboard/vendor/products/page';
 import VendorAnalyticsPage from '@/app/dashboard/vendor/analytics/page';
 import VendorOrdersPage from '@/app/dashboard/vendor/orders/page';
+import VendorTransactionsPage from '@/app/dashboard/vendor/transactions/page';
 
 export default function VendorSpace() {
     return (
@@ -14,6 +15,7 @@ export default function VendorSpace() {
                 <TabsTrigger value="overview">Aperçu</TabsTrigger>
                 <TabsTrigger value="products">Produits</TabsTrigger>
                 <TabsTrigger value="orders">Commandes</TabsTrigger>
+                <TabsTrigger value="transactions">Transactions</TabsTrigger>
                 <TabsTrigger value="analytics">Analyses</TabsTrigger>
             </TabsList>
             <TabsContent value="overview" className="mt-6">
@@ -24,6 +26,9 @@ export default function VendorSpace() {
             </TabsContent>
             <TabsContent value="orders" className="mt-6">
                 <VendorOrdersPage />
+            </TabsContent>
+            <TabsContent value="transactions" className="mt-6">
+                <VendorTransactionsPage />
             </TabsContent>
             <TabsContent value="analytics" className="mt-6">
                 <VendorAnalyticsPage />
