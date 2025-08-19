@@ -25,7 +25,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Link href="/dashboard">
+                <Link href="/">
                   <SidebarMenuButton>
                     <Home />
                     Tableau de bord

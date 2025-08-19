@@ -1,171 +1,51 @@
 "use client";
 
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import Logo from '@/components/logo';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
-import { loginUser, registerUser } from '@/ai/flows/user-actions';
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from '@/lib/firebase';
+import BalanceCard from '@/components/balance-card';
+import Marketplace from '@/components/marketplace';
+import QuickActions from '@/components/quick-actions';
+import RecentTransactions from '@/components/recent-transactions';
+import ExpensesChart from '@/components/expenses-chart';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Terminal } from 'lucide-react';
 import React from 'react';
+import DashboardHeader from '@/components/dashboard-header';
+import { Sidebar, SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import DashboardLayout from './dashboard/layout';
 
-const loginSchema = z.object({
-  email: z.string().email({ message: "L'adresse e-mail n'est pas valide." }),
-  password: z.string().min(1, { message: "Le mot de passe est requis." }),
-});
-
-export default function LoginPage() {
-  const { toast } = useToast();
-  const router = useRouter();
-  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
-
-  const googleProvider = new GoogleAuthProvider();
-
-
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    try {
-      const result = await loginUser(values);
-
-      if (result.userId && result.name) {
-        localStorage.setItem('userName', result.name);
-        localStorage.setItem('userId', result.userId);
-        toast({
-          title: `Bienvenue, ${result.name}!`,
-          description: "Vous êtes maintenant connecté.",
-        });
-        router.push('/dashboard');
-      } else if (result.error) {
-        toast({
-          variant: "destructive",
-          title: "Erreur de connexion",
-          description: result.error,
-        });
-      }
-    } catch (error) {
-       console.error(error);
-       toast({
-        variant: "destructive",
-        title: "Une erreur inattendue est survenue",
-        description: "Veuillez réessayer plus tard.",
-      });
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setIsGoogleLoading(true);
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-
-      if (user && user.email && user.displayName) {
-        // Register or login the user in our system
-        const registrationResult = await registerUser({
-          email: user.email,
-          name: user.displayName,
-          password: `google_auth_${user.uid}` // Dummy password for Google users
-        });
-
-        if (registrationResult.userId) {
-          localStorage.setItem('userName', user.displayName);
-          localStorage.setItem('userId', registrationResult.userId);
-          toast({
-            title: `Bienvenue, ${user.displayName}!`,
-            description: "Vous êtes maintenant connecté avec Google.",
-          });
-          router.push('/dashboard');
-        } else {
-           throw new Error(registrationResult.error || "Échec de l'inscription/connexion interne.");
-        }
-      } else {
-        throw new Error("Les informations de l'utilisateur Google sont incomplètes.");
-      }
-    } catch (error: any) {
-      console.error("Erreur de connexion Google: ", error);
-      toast({
-        variant: "destructive",
-        title: "Erreur de connexion Google",
-        description: error.message || "Impossible de se connecter avec Google.",
-      });
-    } finally {
-      setIsGoogleLoading(false);
-    }
-  };
+export default function App() {
+  const [userName, setUserName] = React.useState<string>("Utilisateur Anonyme");
+  const [userId, setUserId] = React.useState<string | null>('user_anonymous');
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background p-4">
-      <Card className="mx-auto w-full max-w-sm shadow-2xl">
-        <CardHeader className="space-y-2 text-center">
-          <div className="flex justify-center mb-4">
-            <Logo />
+    <DashboardLayout>
+       <div className="flex flex-col gap-6">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+          <div>
+            <h1 className="text-3xl font-bold font-headline tracking-tight">Bienvenue, {userName || 'Utilisateur'}</h1>
+            <p className="text-muted-foreground">Voici votre aperçu financier et commercial.</p>
           </div>
-          <CardTitle className="text-2xl font-headline">Bon retour</CardTitle>
-          <CardDescription>Entrez vos identifiants pour accéder à votre compte</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="m@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center">
-                      <FormLabel>Mot de passe</FormLabel>
-                      <Link href="#" className="ml-auto inline-block text-sm underline hover:text-primary">
-                        Mot de passe oublié?
-                      </Link>
-                    </div>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full font-bold" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Connexion..." : "Se connecter"}
-              </Button>
-            </form>
-          </Form>
-          <Button variant="outline" className="w-full mt-4" onClick={handleGoogleLogin} disabled={isGoogleLoading}>
-            {isGoogleLoading ? "Connexion en cours..." : "Se connecter avec Google"}
-          </Button>
-          <div className="mt-4 text-center text-sm">
-            Vous n'avez pas de compte?{' '}
-            <Link href="/register" className="underline hover:text-primary">
-              S'inscrire
-            </Link>
+          <Alert className="max-w-md bg-amber-100 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 [&>svg]:text-amber-600 dark:[&>svg]:text-amber-400">
+            <Terminal className="h-4 w-4" />
+            <AlertTitle className="text-amber-800 dark:text-amber-200">Mode Démonstration</AlertTitle>
+            <AlertDescription className="text-amber-700 dark:text-amber-300">
+              Vous êtes en mode démonstration. La connexion et l'inscription sont désactivées.
+            </AlertDescription>
+          </Alert>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <BalanceCard userId={userId} />
+            <QuickActions />
+            <RecentTransactions />
           </div>
-        </CardContent>
-      </Card>
-    </div>
+          <div className="lg:col-span-1 space-y-6">
+            <ExpensesChart />
+          </div>
+        </div>
+        
+        <Marketplace />
+      </div>
+    </DashboardLayout>
   );
 }

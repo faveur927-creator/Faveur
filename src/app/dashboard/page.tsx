@@ -14,10 +14,12 @@ export default function DashboardPage() {
   const [userId, setUserId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
+    // In demo mode, we can use a default user or skip this.
+    // For now, let's see if we can get data from local storage if it exists.
     const name = localStorage.getItem('userName');
     const id = localStorage.getItem('userId');
-    setUserName(name);
-    setUserId(id);
+    setUserName(name || "Utilisateur Anonyme");
+    setUserId(id || "user_anonymous");
   }, []);
 
   return (
@@ -29,9 +31,9 @@ export default function DashboardPage() {
         </div>
         <Alert className="max-w-md bg-amber-100 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 [&>svg]:text-amber-600 dark:[&>svg]:text-amber-400">
           <Terminal className="h-4 w-4" />
-          <AlertTitle className="text-amber-800 dark:text-amber-200">Vérification requise</AlertTitle>
+          <AlertTitle className="text-amber-800 dark:text-amber-200">Mode Démonstration</AlertTitle>
           <AlertDescription className="text-amber-700 dark:text-amber-300">
-            Votre compte n'est pas vérifié (KYC). Veuillez compléter votre profil pour débloquer toutes les fonctionnalités.
+            La connexion est désactivée. Vous pouvez naviguer sur le tableau de bord.
           </AlertDescription>
         </Alert>
       </div>
