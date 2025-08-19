@@ -25,7 +25,11 @@ export default function SettingsPage() {
   const [userName, setUserName] = React.useState<string | null>(null);
   const [userEmail, setUserEmail] = React.useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = React.useState<string>("https://i.pravatar.cc/150?u=a042581f4e29026704d");
-  const [kycFile, setKycFile] = React.useState<File | null>(null);
+  
+  const [recto, setRecto] = React.useState<File | null>(null);
+  const [verso, setVerso] = React.useState<File | null>(null);
+  const [numeroCNI, setNumeroCNI] = React.useState("");
+
   const [isUploading, setIsUploading] = React.useState(false);
   const { toast } = useToast();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -49,12 +53,6 @@ export default function SettingsPage() {
     });
   }
 
-  const handleKycFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setKycFile(event.target.files[0]);
-    }
-  };
-  
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -94,21 +92,23 @@ export default function SettingsPage() {
 
   const handleKycSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!kycFile) {
+    if (!recto || !verso || !numeroCNI) {
         toast({
             variant: 'destructive',
-            title: "Aucun fichier sélectionné",
-            description: "Veuillez choisir un document à téléverser.",
+            title: "Champs obligatoires",
+            description: "Veuillez fournir le recto, le verso et le numéro de votre CNI.",
         });
         return;
     }
 
     setIsUploading(true);
     const formData = new FormData();
-    formData.append("file", kycFile);
+    formData.append("recto", recto);
+    formData.append("verso", verso);
+    formData.append("numeroCNI", numeroCNI);
 
     try {
-        const res = await fetch("/api/upload", {
+        const res = await fetch("/api/kyc", {
             method: "POST",
             body: formData,
         });
@@ -117,10 +117,12 @@ export default function SettingsPage() {
 
         if (res.ok) {
             toast({
-                title: "Téléversement réussi",
-                description: `Votre document a été envoyé pour vérification.`,
+                title: "KYC soumis avec succès",
+                description: `Votre CNI n. ${data.numeroCNI} a été envoyée pour vérification.`,
             });
-            setKycFile(null);
+            setRecto(null);
+            setVerso(null);
+            setNumeroCNI("");
         } else {
             throw new Error(data.error || "Une erreur est survenue lors du téléversement.");
         }
@@ -134,6 +136,8 @@ export default function SettingsPage() {
         setIsUploading(false);
     }
   };
+
+  const isKycFormSubmittable = recto && verso && numeroCNI;
 
   return (
     <div className="flex flex-col gap-8">
@@ -161,7 +165,7 @@ export default function SettingsPage() {
                               type="file"
                               ref={fileInputRef}
                               onChange={handleAvatarChange}
-                              accept="image/*"
+                              accept="image/png, image/jpeg"
                               className="hidden"
                             />
                             <Button variant="link" size="sm" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
@@ -202,19 +206,43 @@ export default function SettingsPage() {
                             <Badge variant="destructive">Non vérifié</Badge>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="kyc-file">Pièce d'identité</Label>
-                            <Input id="kyc-file" type="file" onChange={handleKycFileChange} disabled={isUploading} />
+                            <Label htmlFor="numero-cni">Numéro de la CNI</Label>
+                            <Input 
+                                id="numero-cni" 
+                                type="text" 
+                                value={numeroCNI} 
+                                onChange={(e) => setNumeroCNI(e.target.value)} 
+                                placeholder="C00123456789"
+                                disabled={isUploading} 
+                            />
                         </div>
-                        {kycFile && (
-                        <div className="text-sm text-muted-foreground flex items-center gap-2 p-2 bg-muted rounded-md">
-                            <FileCheck className="h-4 w-4 text-green-500" />
-                            <span>{kycFile.name}</span>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="recto-cni">Recto de la CNI</Label>
+                            <Input id="recto-cni" type="file" onChange={(e) => setRecto(e.target.files?.[0] || null)} accept="image/png, image/jpeg" disabled={isUploading} />
                         </div>
+                         {recto && (
+                            <div className="text-sm text-muted-foreground flex items-center gap-2 p-2 bg-muted/50 rounded-md">
+                                <FileCheck className="h-4 w-4 text-green-500" />
+                                <span>{recto.name}</span>
+                            </div>
                         )}
+
+                        <div className="space-y-2">
+                            <Label htmlFor="verso-cni">Verso de la CNI</Label>
+                            <Input id="verso-cni" type="file" onChange={(e) => setVerso(e.target.files?.[0] || null)} accept="image/png, image/jpeg" disabled={isUploading} />
+                        </div>
+                         {verso && (
+                            <div className="text-sm text-muted-foreground flex items-center gap-2 p-2 bg-muted/50 rounded-md">
+                                <FileCheck className="h-4 w-4 text-green-500" />
+                                <span>{verso.name}</span>
+                            </div>
+                        )}
+
                         <p className="text-sm text-muted-foreground">
-                            Téléchargez une copie de votre CNI, passeport, etc.
+                            Téléchargez des images claires (JPG, PNG) de votre pièce d'identité.
                         </p>
-                        <Button type="submit" className="w-full" disabled={isUploading || !kycFile}>
+                        <Button type="submit" className="w-full" disabled={isUploading || !isKycFormSubmittable}>
                             <Upload className="mr-2 h-4 w-4"/>
                             {isUploading ? "Envoi en cours..." : "Lancer la vérification"}
                         </Button>
@@ -265,5 +293,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-
-    
