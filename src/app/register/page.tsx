@@ -16,6 +16,7 @@ import { registerUser, loginUser } from '@/ai/flows/user-actions';
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères." }),
   email: z.string().email({ message: "L'adresse e-mail n'est pas valide." }),
+  phone: z.string().min(9, { message: "Le numéro de téléphone doit contenir au moins 9 chiffres."}),
   password: z.string().min(8, { message: "Le mot de passe doit contenir au moins 8 caractères." }),
 });
 
@@ -29,13 +30,21 @@ export default function RegisterPage() {
     defaultValues: {
       name: "",
       email: "",
+      phone: "",
       password: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof registerSchema>) => {
     try {
-      const result = await registerUser(values);
+      // For now, we'll keep the existing registration logic.
+      // We will replace this with OTP flow in the next steps.
+      const result = await registerUser({
+        name: values.name,
+        email: values.email,
+        password: values.password
+      });
+
       if (result.userId) {
         toast({
           title: "Compte créé avec succès!",
@@ -46,6 +55,7 @@ export default function RegisterPage() {
         const loginResult = await loginUser({ email: values.email, password: values.password });
         if (loginResult.userId && loginResult.name) {
           localStorage.setItem('userName', loginResult.name);
+          localStorage.setItem('userId', loginResult.userId);
           router.push('/dashboard');
         } else {
            toast({
@@ -105,6 +115,19 @@ export default function RegisterPage() {
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input placeholder="m@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Téléphone</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+221 77 123 45 67" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
