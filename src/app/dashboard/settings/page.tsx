@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { ArrowUpRight, ArrowDownLeft, FileCheck, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 
@@ -24,11 +24,12 @@ const transactions = [
 export default function SettingsPage() {
   const [userName, setUserName] = React.useState<string | null>(null);
   const [userEmail, setUserEmail] = React.useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const { toast } = useToast();
 
   React.useEffect(() => {
     const name = localStorage.getItem('userName');
-    const email = localStorage.getItem('userEmail'); // Assuming email is stored as well
+    const email = localStorage.getItem('userEmail');
     setUserName(name);
     setUserEmail(email);
   }, []);
@@ -40,6 +41,28 @@ export default function SettingsPage() {
         description: "Vos informations ont été sauvegardées (simulation).",
     });
   }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
+  const handleKycSubmit = () => {
+    if (!selectedFile) {
+        toast({
+            variant: 'destructive',
+            title: "Aucun fichier sélectionné",
+            description: "Veuillez choisir un document à téléverser.",
+        });
+        return;
+    }
+    toast({
+        title: "Téléversement réussi",
+        description: `Votre document "${selectedFile.name}" a été envoyé pour vérification (simulation).`,
+    });
+    setSelectedFile(null); // Reset after upload
+  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -97,10 +120,23 @@ export default function SettingsPage() {
                         <p className="font-medium">Statut</p>
                         <Badge variant="destructive">Non vérifié</Badge>
                     </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="kyc-file">Pièce d'identité</Label>
+                        <Input id="kyc-file" type="file" onChange={handleFileChange} />
+                    </div>
+                    {selectedFile && (
+                    <div className="text-sm text-muted-foreground flex items-center gap-2 p-2 bg-muted rounded-md">
+                        <FileCheck className="h-4 w-4 text-green-500" />
+                        <span>{selectedFile.name}</span>
+                    </div>
+                    )}
                     <p className="text-sm text-muted-foreground">
-                        Téléchargez une copie de votre pièce d'identité (carte d'identité nationale, passeport, etc.) pour compléter le processus de vérification.
+                        Téléchargez une copie de votre CNI, passeport, etc.
                     </p>
-                    <Button className="w-full">Lancer la vérification</Button>
+                    <Button className="w-full" onClick={handleKycSubmit}>
+                        <Upload className="mr-2 h-4 w-4"/>
+                        Lancer la vérification
+                    </Button>
                 </CardContent>
             </Card>
 
