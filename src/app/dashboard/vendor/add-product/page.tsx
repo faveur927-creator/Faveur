@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import Link from "next/link";
@@ -22,14 +23,14 @@ export default function AddProductPage() {
             title: "Produit ajouté avec succès (Simulation)",
             description: "Votre nouveau produit est maintenant visible sur le marché.",
         });
-        router.push('/dashboard/vendor');
+        router.push('/dashboard/vendor/products');
     };
 
     return (
         <div className="flex flex-col gap-8">
             <div className="flex items-center gap-4">
                 <Button variant="outline" size="icon" asChild>
-                  <Link href="/dashboard/vendor">
+                  <Link href="/dashboard/vendor/products">
                     <ArrowLeft className="h-4 w-4" />
                   </Link>
                 </Button>

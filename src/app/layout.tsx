@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import type { Metadata } from 'next';
@@ -8,23 +9,20 @@ import Link from 'next/link';
 import {
   SidebarProvider,
   Sidebar,
-  SidebarInset,
   SidebarHeader,
   SidebarContent,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
+  SidebarSeparator,
+  SidebarGroup,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { Home, ShoppingCart, Wallet, Settings, Bell, Store, ChevronDown, PlusCircle } from 'lucide-react';
+import { Home, ShoppingCart, Wallet, Settings, Bell, Store, BarChart, Package, PlusCircle, LayoutGrid } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard-header';
 import Logo from '@/components/logo';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
 import React from 'react';
 
 // export const metadata: Metadata = {
@@ -39,7 +37,6 @@ export default function RootLayout({
 }>) {
 
   const pathname = usePathname();
-  const isVendorRoute = pathname.startsWith('/dashboard/vendor');
 
   return (
     <html lang="fr" suppressHydrationWarning>
@@ -59,68 +56,70 @@ export default function RootLayout({
               </SidebarHeader>
               <SidebarContent>
                 <SidebarMenu>
-                  <SidebarMenuItem>
-                      <SidebarMenuButton asChild isActive={pathname === '/dashboard'}>
-                        <Link href="/dashboard">
-                          <Home />
-                          Tableau de bord
-                        </Link>
-                      </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={pathname === '/dashboard/transactions'}>
-                      <Link href="/dashboard/transactions">
-                        <Wallet />
-                        Transactions
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/marketplace')}>
-                       <Link href="/dashboard/marketplace">
-                        <ShoppingCart />
-                        Marché
-                       </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  
-                  <Collapsible defaultOpen={isVendorRoute}>
-                    <SidebarMenuItem>
-                      <CollapsibleTrigger asChild>
-                         <SidebarMenuButton isActive={isVendorRoute}>
-                            <Store />
-                            <span>Espace Vendeur</span>
-                            <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                  <SidebarGroup>
+                    <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+                      <SidebarMenuItem>
+                          <SidebarMenuButton asChild isActive={pathname === '/dashboard' || pathname === '/'}>
+                            <Link href="/">
+                              <Home />
+                              Tableau de bord
+                            </Link>
+                          </SidebarMenuButton>
+                      </SidebarMenuItem>
+                      <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname === '/dashboard/transactions'}>
+                          <Link href="/dashboard/transactions">
+                            <Wallet />
+                            Transactions
+                          </Link>
                         </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                    </SidebarMenuItem>
-                    <CollapsibleContent asChild>
-                       <SidebarMenuSub>
-                        <SidebarMenuSubItem>
-                          <SidebarMenuSubButton asChild isActive={pathname === '/dashboard/vendor'}>
-                            <Link href="/dashboard/vendor">
-                              Mes Produits
+                      </SidebarMenuItem>
+                      <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/marketplace')}>
+                           <Link href="/dashboard/marketplace">
+                            <ShoppingCart />
+                            Marché
+                           </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                       <SidebarMenuItem>
+                        <SidebarMenuButton>
+                          <Bell />
+                          Notifications
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                  </SidebarGroup>
+                  
+                  <SidebarSeparator />
+                  
+                  <SidebarGroup>
+                      <SidebarGroupLabel>Espace Vendeur</SidebarGroupLabel>
+                      <SidebarMenuItem>
+                          <SidebarMenuButton asChild isActive={pathname === '/dashboard/vendor/dashboard'}>
+                            <Link href="/dashboard/vendor/dashboard">
+                              <LayoutGrid />
+                              Aperçu
                             </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                        <SidebarMenuSubItem>
-                          <SidebarMenuSubButton asChild isActive={pathname === '/dashboard/vendor/add-product'}>
-                             <Link href="/dashboard/vendor/add-product">
-                              Ajouter un produit
+                          </SidebarMenuButton>
+                      </SidebarMenuItem>
+                       <SidebarMenuItem>
+                          <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/vendor/products') || pathname.startsWith('/dashboard/vendor/add-product')}>
+                            <Link href="/dashboard/vendor/products">
+                              <Package />
+                              Produits
                             </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
-                  </Collapsible>
+                          </SidebarMenuButton>
+                      </SidebarMenuItem>
+                      <SidebarMenuItem>
+                          <SidebarMenuButton asChild isActive={pathname === '/dashboard/vendor/analytics'}>
+                            <Link href="/dashboard/vendor/analytics">
+                              <BarChart />
+                              Analyses
+                            </Link>
+                          </SidebarMenuButton>
+                      </SidebarMenuItem>
+                  </SidebarGroup>
 
-
-                  <SidebarMenuItem>
-                    <SidebarMenuButton>
-                      <Bell />
-                      Notifications
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
                 </SidebarMenu>
               </SidebarContent>
               <SidebarFooter>
@@ -136,12 +135,12 @@ export default function RootLayout({
                 </SidebarMenu>
               </SidebarFooter>
             </Sidebar>
-            <SidebarInset>
+            <main className="flex-1">
               <DashboardHeader />
-              <main className="p-4 sm:p-6 lg:p-8">
+              <div className="p-4 sm:p-6 lg:p-8">
                 {children}
-              </main>
-            </SidebarInset>
+              </div>
+            </main>
           </div>
         </SidebarProvider>
         <Toaster />

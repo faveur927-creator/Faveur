@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,7 @@ import {
 import Link from 'next/link';
 
 
-export default function VendorPage() {
+export default function VendorProductsPage() {
   // For this simulation, we'll just use the existing products list.
   const vendorProducts = products;
 
