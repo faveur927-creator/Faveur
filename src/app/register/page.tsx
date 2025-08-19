@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import Logo from '@/components/logo';
-import { useForm } from 'react-hook-form';
+import { useForm, useFormState } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { registerUser, loginUser, sendOtp } from '@/ai/flows/user-actions';
 import React from 'react';
+import OtpForm from '@/components/otp-form';
 
 const registerSchema = z.object({
   name: z.string().min(2, { message: "Le nom doit contenir au moins 2 caractères." }),
@@ -26,6 +27,7 @@ export default function RegisterPage() {
   const { toast } = useToast();
   const router = useRouter();
   const [step, setStep] = React.useState('register'); // 'register' or 'verify_otp'
+  const [submittedOtp, setSubmittedOtp] = React.useState<string | null>(null);
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -37,7 +39,9 @@ export default function RegisterPage() {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof registerSchema>) => {
+  const { isSubmitting } = useFormState({ control: form.control });
+
+  const handleRegistrationSubmit = async (values: z.infer<typeof registerSchema>) => {
     try {
       const otpResult = await sendOtp({ phone: values.phone });
 
@@ -46,7 +50,8 @@ export default function RegisterPage() {
           title: "Code de vérification envoyé (simulation)",
           description: `Votre code est : ${otpResult.otp}`,
         });
-        setStep('verify_otp');
+        setSubmittedOtp(otpResult.otp); // Store the "sent" OTP
+        setStep('verify_otp'); // Move to the next step
       } else {
         toast({
           variant: "destructive",
@@ -64,6 +69,48 @@ export default function RegisterPage() {
     }
   };
 
+  const handleOtpSubmit = async (otp: string) => {
+    // In a real app, you might verify the OTP on the backend. Here, we just compare.
+    if (otp === submittedOtp) {
+      try {
+        const registrationData = form.getValues();
+        const registerResult = await registerUser(registrationData);
+
+        if (registerResult.userId) {
+          const loginResult = await loginUser({ email: registrationData.email, password: registrationData.password });
+          if(loginResult.userId && loginResult.name) {
+            localStorage.setItem('userName', loginResult.name);
+            localStorage.setItem('userId', loginResult.userId);
+            toast({
+              title: `Bienvenue, ${loginResult.name}!`,
+              description: "Votre compte a été créé avec succès.",
+            });
+            router.push('/dashboard');
+          }
+        } else {
+            toast({
+              variant: "destructive",
+              title: "Erreur d'inscription",
+              description: registerResult.error,
+            });
+        }
+      } catch (error) {
+         toast({
+            variant: "destructive",
+            title: "Erreur",
+            description: "Une erreur est survenue lors de la finalisation de l'inscription.",
+          });
+      }
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Code incorrect",
+        description: "Le code OTP que vous avez entré n'est pas valide. Veuillez réessayer.",
+      });
+    }
+  };
+
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
       <Card className="mx-auto w-full max-w-sm shadow-2xl">
@@ -71,74 +118,93 @@ export default function RegisterPage() {
           <div className="flex justify-center mb-4">
             <Logo />
           </div>
-          <CardTitle className="text-2xl font-headline">Créer un compte</CardTitle>
-          <CardDescription>Entrez vos informations pour créer un nouveau compte</CardDescription>
+          <CardTitle className="text-2xl font-headline">
+            {step === 'register' ? 'Créer un compte' : 'Vérifiez votre numéro'}
+          </CardTitle>
+          <CardDescription>
+            {step === 'register'
+              ? 'Entrez vos informations pour créer un nouveau compte'
+              : `Nous avons envoyé un code à 6 chiffres au ${form.getValues().phone}`}
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nom</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John Doe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="m@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Téléphone</FormLabel>
-                    <FormControl>
-                      <Input placeholder="+221 77 123 45 67" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mot de passe</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full font-bold" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Envoi en cours..." : "Recevoir le code"}
-              </Button>
-            </form>
-          </Form>
+          {step === 'register' ? (
+             <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleRegistrationSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nom</FormLabel>
+                      <FormControl>
+                        <Input placeholder="John Doe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="m@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Téléphone</FormLabel>
+                      <FormControl>
+                        <Input placeholder="+221 77 123 45 67" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mot de passe</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full font-bold" disabled={isSubmitting}>
+                  {isSubmitting ? "Envoi en cours..." : "Recevoir le code"}
+                </Button>
+              </form>
+            </Form>
+          ) : (
+            <OtpForm onSubmit={handleOtpSubmit} />
+          )}
+
           <div className="mt-4 text-center text-sm">
-            Vous avez déjà un compte?{' '}
-            <Link href="/" className="underline hover:text-primary">
-              Se connecter
-            </Link>
+            {step === 'register' ? (
+              <>
+                Vous avez déjà un compte?{' '}
+                <Link href="/" className="underline hover:text-primary">
+                  Se connecter
+                </Link>
+              </>
+            ) : (
+              <Button variant="link" onClick={() => setStep('register')} className="p-0 h-auto">
+                Modifier le numéro de téléphone?
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
