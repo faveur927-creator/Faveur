@@ -8,6 +8,7 @@ export const products = [
       dataAiHint: 'headphones music',
       stock: 24,
       category: 'Électronique',
+      description: 'Plongez dans un son immersif avec ce casque sans fil doté d\'une annulation de bruit active de pointe, d\'une autonomie de 30 heures et d\'un confort exceptionnel pour des heures d\'écoute.'
     },
     {
       id: '2',
@@ -17,6 +18,7 @@ export const products = [
       dataAiHint: 'smart watch',
       stock: 50,
       category: 'Électronique',
+      description: 'Suivez votre activité quotidienne, votre sommeil et votre fréquence cardiaque avec ce tracker élégant et résistant à l\'eau. Recevez des notifications de votre smartphone directement à votre poignet.'
     },
     {
       id: '3',
@@ -26,6 +28,7 @@ export const products = [
       dataAiHint: 'coffee maker',
       stock: 15,
       category: 'Maison',
+      description: 'Préparez un espresso de qualité où que vous soyez. Cette machine compacte et légère est parfaite pour les voyages, le camping ou le bureau. Compatible avec les capsules et le café moulu.'
     },
     {
       id: '4',
@@ -35,6 +38,7 @@ export const products = [
       dataAiHint: 'office chair',
       stock: 8,
       category: 'Mobilier',
+      description: 'Travaillez confortablement pendant des heures grâce à cette chaise de bureau entièrement réglable. Elle offre un excellent soutien lombaire, des accoudoirs 4D et un dossier en maille respirante.'
     },
     {
       id: '5',
@@ -44,6 +48,7 @@ export const products = [
       dataAiHint: 'tshirt clothes',
       stock: 120,
       category: 'Mode',
+      description: 'Un essentiel de toute garde-robe. Ce t-shirt doux et respirant est fabriqué à partir de 100% de coton biologique certifié, pour un style simple et durable.'
     },
     {
       id: '6',
@@ -53,6 +58,7 @@ export const products = [
       dataAiHint: 'sneakers shoes',
       stock: 45,
       category: 'Mode',
+      description: 'Améliorez vos performances avec ces baskets de course légères et réactives. Elles offrent un amorti exceptionnel et une excellente adhérence sur toutes les surfaces.'
     },
     {
       id: '7',
@@ -62,6 +68,7 @@ export const products = [
       dataAiHint: 'healthy food',
       stock: 99,
       category: 'Services',
+      description: 'Atteignez vos objectifs de santé avec un plan de nutrition personnalisé et un suivi hebdomadaire par un coach certifié. Consultation initiale d\'une heure incluse.'
     },
     {
       id: '8',
@@ -71,6 +78,7 @@ export const products = [
       dataAiHint: 'vegetable basket',
       stock: 30,
       category: 'Alimentaire',
+      description: 'Recevez chaque semaine une sélection de fruits et légumes frais, de saison et certifiés biologiques, provenant de producteurs locaux. Idéal pour 2-3 personnes.'
     }
   ];
   
