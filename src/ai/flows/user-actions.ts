@@ -65,6 +65,7 @@ const registerUserFlow = ai.defineFlow(
       };
 
       users.push(newUser);
+      console.log('Users in memory:', users);
 
       return { userId: newUser.id };
     } catch (e) {
@@ -102,6 +103,7 @@ const loginUserFlow = ai.defineFlow(
     async ({ email, password }) => {
         try {
             const user = users.find(u => u.email === email);
+            console.log('Attempting login for:', email, 'Found user:', user);
 
             if (!user) {
                 return { error: "L'e-mail ou le mot de passe est incorrect." };

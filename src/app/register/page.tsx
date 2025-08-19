@@ -86,6 +86,12 @@ export default function RegisterPage() {
               description: "Votre compte a été créé avec succès.",
             });
             router.push('/dashboard');
+          } else {
+             toast({
+              variant: "destructive",
+              title: "Erreur de connexion",
+              description: loginResult.error || "Impossible de se connecter après l'inscription.",
+            });
           }
         } else {
             toast({
@@ -93,6 +99,7 @@ export default function RegisterPage() {
               title: "Erreur d'inscription",
               description: registerResult.error,
             });
+            setStep('register'); // Go back to registration form on error
         }
       } catch (error) {
          toast({
