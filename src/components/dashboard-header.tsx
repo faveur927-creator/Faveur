@@ -32,17 +32,18 @@ export default function DashboardHeader() {
   )
 
   useEffect(() => {
-    // Navigate to marketplace if user starts searching from another page
+    // Si l'utilisateur recherche depuis une autre page, le rediriger vers le marché
     if (searchQuery && pathname !== '/dashboard/marketplace') {
       router.push('/dashboard/marketplace?' + createQueryString('q', searchQuery));
     } else {
+       // Utilise replace pour éviter d'ajouter une entrée dans l'historique pour chaque caractère tapé
        const newUrl = `${pathname}?${createQueryString('q', searchQuery)}`;
-       // Using replace to avoid adding a new entry to the history stack for each character typed
        router.replace(newUrl, { scroll: false });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, router, pathname]);
 
+  // Met à jour la barre de recherche si les paramètres de l'URL changent (ex: navigation arrière/avant)
   useEffect(() => {
     setSearchQuery(searchParams.get('q') || '');
   }, [searchParams]);
