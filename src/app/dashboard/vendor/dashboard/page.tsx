@@ -5,55 +5,56 @@ import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 const data = [
     {
       name: "Jan",
-      total: Math.floor(Math.random() * 5000) + 1000,
+      total: Math.floor(Math.random() * 500000) + 100000,
     },
     {
       name: "Feb",
-      total: Math.floor(Math.random() * 5000) + 1000,
+      total: Math.floor(Math.random() * 500000) + 100000,
     },
     {
       name: "Mar",
-      total: Math.floor(Math.random() * 5000) + 1000,
+      total: Math.floor(Math.random() * 500000) + 100000,
     },
     {
       name: "Apr",
-      total: Math.floor(Math.random() * 5000) + 1000,
+      total: Math.floor(Math.random() * 500000) + 100000,
     },
     {
       name: "May",
-      total: Math.floor(Math.random() * 5000) + 1000,
+      total: Math.floor(Math.random() * 500000) + 100000,
     },
     {
       name: "Jun",
-      total: Math.floor(Math.random() * 5000) + 1000,
+      total: Math.floor(Math.random() * 500000) + 100000,
     },
     {
       name: "Jul",
-      total: Math.floor(Math.random() * 5000) + 1000,
+      total: Math.floor(Math.random() * 500000) + 100000,
     },
     {
       name: "Aug",
-      total: Math.floor(Math.random() * 5000) + 1000,
+      total: Math.floor(Math.random() * 500000) + 100000,
     },
     {
       name: "Sep",
-      total: Math.floor(Math.random() * 5000) + 1000,
+      total: Math.floor(Math.random() * 500000) + 100000,
     },
     {
       name: "Oct",
-      total: Math.floor(Math.random() * 5000) + 1000,
+      total: Math.floor(Math.random() * 500000) + 100000,
     },
     {
       name: "Nov",
-      total: Math.floor(Math.random() * 5000) + 1000,
+      total: Math.floor(Math.random() * 500000) + 100000,
     },
     {
       name: "Dec",
-      total: Math.floor(Math.random() * 5000) + 1000,
+      total: Math.floor(Math.random() * 500000) + 100000,
     },
 ]
 
 export default function VendorDashboardPage() {
+    const totalRevenue = data.reduce((acc, item) => acc + item.total, 0);
     return (
         <div className="flex flex-col gap-8">
             <div>
@@ -67,7 +68,7 @@ export default function VendorDashboardPage() {
                         <DollarSign className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">1,250,000 FCFA</div>
+                        <div className="text-2xl font-bold">{totalRevenue.toLocaleString('fr-FR')} FCFA</div>
                         <p className="text-xs text-muted-foreground">+20.1% depuis le mois dernier</p>
                     </CardContent>
                 </Card>
@@ -112,7 +113,7 @@ export default function VendorDashboardPage() {
                             fontSize={12}
                             tickLine={false}
                             axisLine={false}
-                            tickFormatter={(value) => `${value/1000}K`}
+                            tickFormatter={(value) => `${Number(value)/1000}K`}
                             />
                             <Bar dataKey="total" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                         </BarChart>
