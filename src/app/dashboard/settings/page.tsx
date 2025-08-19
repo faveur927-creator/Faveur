@@ -24,15 +24,21 @@ const transactions = [
 export default function SettingsPage() {
   const [userName, setUserName] = React.useState<string | null>(null);
   const [userEmail, setUserEmail] = React.useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+  const [avatarUrl, setAvatarUrl] = React.useState<string>("https://i.pravatar.cc/150?u=a042581f4e29026704d");
+  const [kycFile, setKycFile] = React.useState<File | null>(null);
   const [isUploading, setIsUploading] = React.useState(false);
   const { toast } = useToast();
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     const name = localStorage.getItem('userName');
     const email = localStorage.getItem('userEmail');
+    const avatar = localStorage.getItem('userAvatar');
     setUserName(name);
     setUserEmail(email);
+    if(avatar) {
+      setAvatarUrl(avatar);
+    }
   }, []);
 
   const handleUpdateProfile = (event: React.FormEvent) => {
@@ -43,15 +49,52 @@ export default function SettingsPage() {
     });
   }
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleKycFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      setSelectedFile(event.target.files[0]);
+      setKycFile(event.target.files[0]);
+    }
+  };
+  
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        const newAvatarUrl = `/uploads/${data.file.filename}`;
+        setAvatarUrl(newAvatarUrl);
+        localStorage.setItem('userAvatar', newAvatarUrl);
+        toast({
+          title: "Photo de profil mise à jour!",
+          description: "Votre nouvelle photo a été enregistrée.",
+        });
+      } else {
+        throw new Error(data.error || "Une erreur est survenue.");
+      }
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: "Erreur",
+        description: error.message,
+      });
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const handleKycSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!selectedFile) {
+    if (!kycFile) {
         toast({
             variant: 'destructive',
             title: "Aucun fichier sélectionné",
@@ -62,7 +105,7 @@ export default function SettingsPage() {
 
     setIsUploading(true);
     const formData = new FormData();
-    formData.append("file", selectedFile);
+    formData.append("file", kycFile);
 
     try {
         const res = await fetch("/api/upload", {
@@ -77,7 +120,7 @@ export default function SettingsPage() {
                 title: "Téléversement réussi",
                 description: `Votre document a été envoyé pour vérification.`,
             });
-            setSelectedFile(null);
+            setKycFile(null);
         } else {
             throw new Error(data.error || "Une erreur est survenue lors du téléversement.");
         }
@@ -111,10 +154,19 @@ export default function SettingsPage() {
                     <form onSubmit={handleUpdateProfile} className="space-y-4">
                         <div className="flex flex-col items-center space-y-2">
                            <Avatar className="h-24 w-24">
-                                <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt={userName || 'User'} />
+                                <AvatarImage src={avatarUrl} alt={userName || 'User'} />
                                 <AvatarFallback>{userName?.charAt(0).toUpperCase()}</AvatarFallback>
                             </Avatar>
-                            <Button variant="link" size="sm">Changer de photo</Button>
+                            <input
+                              type="file"
+                              ref={fileInputRef}
+                              onChange={handleAvatarChange}
+                              accept="image/*"
+                              className="hidden"
+                            />
+                            <Button variant="link" size="sm" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                                {isUploading ? 'Chargement...' : 'Changer de photo'}
+                            </Button>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="name">Nom complet</Label>
@@ -151,18 +203,18 @@ export default function SettingsPage() {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="kyc-file">Pièce d'identité</Label>
-                            <Input id="kyc-file" type="file" onChange={handleFileChange} disabled={isUploading} />
+                            <Input id="kyc-file" type="file" onChange={handleKycFileChange} disabled={isUploading} />
                         </div>
-                        {selectedFile && (
+                        {kycFile && (
                         <div className="text-sm text-muted-foreground flex items-center gap-2 p-2 bg-muted rounded-md">
                             <FileCheck className="h-4 w-4 text-green-500" />
-                            <span>{selectedFile.name}</span>
+                            <span>{kycFile.name}</span>
                         </div>
                         )}
                         <p className="text-sm text-muted-foreground">
                             Téléchargez une copie de votre CNI, passeport, etc.
                         </p>
-                        <Button type="submit" className="w-full" disabled={isUploading || !selectedFile}>
+                        <Button type="submit" className="w-full" disabled={isUploading || !kycFile}>
                             <Upload className="mr-2 h-4 w-4"/>
                             {isUploading ? "Envoi en cours..." : "Lancer la vérification"}
                         </Button>
@@ -213,3 +265,5 @@ export default function SettingsPage() {
     </div>
   );
 }
+
+    
