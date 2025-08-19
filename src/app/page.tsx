@@ -12,8 +12,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { loginUser } from '@/ai/flows/user-actions';
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from '@/lib/firebase';
+// import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+// import { auth } from '@/lib/firebase';
 import React from 'react';
 
 const loginSchema = z.object({
@@ -26,7 +26,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
 
-  const googleProvider = new GoogleAuthProvider();
+  // const googleProvider = new GoogleAuthProvider();
 
 
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -68,30 +68,36 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-
-      if (user) {
-        // Here, we could also call a flow to register/login the user in our own DB
-        localStorage.setItem('userName', user.displayName || 'Utilisateur Google');
-        localStorage.setItem('userId', user.uid);
-        toast({
-          title: `Bienvenue, ${user.displayName || 'Utilisateur'}!`,
-          description: "Vous êtes maintenant connecté avec Google.",
-        });
-        router.push('/dashboard');
-      }
-    } catch (error) {
-      console.error("Erreur de connexion Google: ", error);
-      toast({
+    toast({
         variant: "destructive",
-        title: "Erreur de connexion Google",
-        description: "Impossible de se connecter avec Google. Assurez-vous d'avoir activé ce fournisseur dans votre console Firebase.",
-      });
-    } finally {
-      setIsGoogleLoading(false);
-    }
+        title: "Fonctionnalité désactivée",
+        description: "La connexion Google est temporairement désactivée en raison d'un problème de configuration externe.",
+    });
+    setIsGoogleLoading(false);
+    // try {
+    //   const result = await signInWithPopup(auth, googleProvider);
+    //   const user = result.user;
+
+    //   if (user) {
+    //     // Here, we could also call a flow to register/login the user in our own DB
+    //     localStorage.setItem('userName', user.displayName || 'Utilisateur Google');
+    //     localStorage.setItem('userId', user.uid);
+    //     toast({
+    //       title: `Bienvenue, ${user.displayName || 'Utilisateur'}!`,
+    //       description: "Vous êtes maintenant connecté avec Google.",
+    //     });
+    //     router.push('/dashboard');
+    //   }
+    // } catch (error) {
+    //   console.error("Erreur de connexion Google: ", error);
+    //   toast({
+    //     variant: "destructive",
+    //     title: "Erreur de connexion Google",
+    //     description: "Impossible de se connecter avec Google. Assurez-vous d'avoir activé ce fournisseur dans votre console Firebase.",
+    //   });
+    // } finally {
+    //   setIsGoogleLoading(false);
+    // }
   };
 
   return (

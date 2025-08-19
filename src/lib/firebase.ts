@@ -6,13 +6,13 @@ import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  "projectId": "superapp-mvp-proposal",
-  "appId": "1:552824195923:web:7a77ccdff6b4940da0efa6",
-  "storageBucket": "superapp-mvp-proposal.firebasestorage.app",
-  "apiKey": "AIzaSyAXNgCPFmZ8_61Ru0iZUes7HtgM1ev18oY",
-  "authDomain": "superapp-mvp-proposal.firebaseapp.com",
-  "measurementId": "",
-  "messagingSenderId": "552824195923"
+  // "projectId": "superapp-mvp-proposal",
+  // "appId": "1:552824195923:web:7a77ccdff6b4940da0efa6",
+  // "storageBucket": "superapp-mvp-proposal.firebasestorage.app",
+  // "apiKey": "AIzaSyAXNgCPFmZ8_61Ru0iZUes7HtgM1ev18oY",
+  // "authDomain": "superapp-mvp-proposal.firebaseapp.com",
+  // "measurementId": "",
+  // "messagingSenderId": "552824195923"
 };
 
 // Initialize Firebase
