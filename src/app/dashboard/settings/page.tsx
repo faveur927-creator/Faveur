@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -8,8 +9,9 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ArrowUpRight, ArrowDownLeft, FileCheck, Upload, Loader2 } from 'lucide-react';
+import { ArrowUpRight, ArrowDownLeft, FileCheck, Upload, Loader2, Store } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Textarea } from '@/components/ui/textarea';
 
 
 const transactions = [
@@ -25,14 +27,19 @@ export default function SettingsPage() {
   const [userName, setUserName] = React.useState<string | null>(null);
   const [userEmail, setUserEmail] = React.useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = React.useState<string>("https://i.pravatar.cc/150?u=a042581f4e29026704d");
+  const [shopLogoUrl, setShopLogoUrl] = React.useState<string | null>(null);
   
   const [recto, setRecto] = React.useState<File | null>(null);
   const [verso, setVerso] = React.useState<File | null>(null);
   const [numeroCNI, setNumeroCNI] = React.useState("");
 
   const [isUploading, setIsUploading] = React.useState(false);
+  const [isUploadingLogo, setIsUploadingLogo] = React.useState(false);
+
   const { toast } = useToast();
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const avatarInputRef = React.useRef<HTMLInputElement>(null);
+  const logoInputRef = React.useRef<HTMLInputElement>(null);
+
 
   React.useEffect(() => {
     const name = localStorage.getItem('userName');
@@ -50,6 +57,14 @@ export default function SettingsPage() {
     toast({
         title: "Profil mis à jour",
         description: "Vos informations ont été sauvegardées (simulation).",
+    });
+  }
+  
+  const handleUpdateVendorProfile = (event: React.FormEvent) => {
+    event.preventDefault();
+    toast({
+        title: "Profil Vendeur mis à jour",
+        description: "Les informations de votre boutique ont été sauvegardées (simulation).",
     });
   }
 
@@ -87,6 +102,42 @@ export default function SettingsPage() {
       });
     } finally {
       setIsUploading(false);
+    }
+  };
+  
+    const handleLogoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingLogo(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        const newLogoUrl = `/uploads/${data.file.filename}`;
+        setShopLogoUrl(newLogoUrl);
+        toast({
+          title: "Logo de la boutique mis à jour!",
+          description: "Votre nouveau logo a été enregistré.",
+        });
+      } else {
+        throw new Error(data.error || "Une erreur est survenue.");
+      }
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: "Erreur",
+        description: error.message,
+      });
+    } finally {
+      setIsUploadingLogo(false);
     }
   };
 
@@ -143,7 +194,7 @@ export default function SettingsPage() {
     <div className="flex flex-col gap-8">
       <div>
         <h1 className="text-3xl font-bold font-headline tracking-tight">Paramètres</h1>
-        <p className="text-muted-foreground">Gérez votre profil, vos documents et vos transactions.</p>
+        <p className="text-muted-foreground">Gérez votre profil, votre boutique, vos documents et vos transactions.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -163,12 +214,12 @@ export default function SettingsPage() {
                             </Avatar>
                             <input
                               type="file"
-                              ref={fileInputRef}
+                              ref={avatarInputRef}
                               onChange={handleAvatarChange}
                               accept="image/png, image/jpeg"
                               className="hidden"
                             />
-                            <Button variant="link" size="sm" type="button" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                            <Button variant="link" size="sm" type="button" onClick={() => avatarInputRef.current?.click()} disabled={isUploading}>
                                 {isUploading ? 'Chargement...' : 'Changer de photo'}
                             </Button>
                         </div>
@@ -193,7 +244,7 @@ export default function SettingsPage() {
                 </CardContent>
             </Card>
 
-             {/* KYC Card */}
+            {/* KYC Card */}
             <Card>
                  <form onSubmit={handleKycSubmit}>
                     <CardHeader>
@@ -251,7 +302,59 @@ export default function SettingsPage() {
             </Card>
 
         </div>
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 flex flex-col gap-8">
+            {/* Vendor Profile Card */}
+             <Card>
+                <CardHeader>
+                    <CardTitle>Profil Vendeur</CardTitle>
+                    <CardDescription>Gérez les informations publiques de votre boutique.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleUpdateVendorProfile} className="space-y-6">
+                       <div className="space-y-4">
+                           <Label>Logo de la boutique</Label>
+                           <div className="flex items-center gap-4">
+                                <Avatar className="h-24 w-24 rounded-md">
+                                    <AvatarImage src={shopLogoUrl ?? undefined} alt="Logo de la boutique" />
+                                    <AvatarFallback className="rounded-md"><Store className="h-10 w-10 text-muted-foreground" /></AvatarFallback>
+                                </Avatar>
+                                <input
+                                  type="file"
+                                  ref={logoInputRef}
+                                  onChange={handleLogoChange}
+                                  accept="image/png, image/jpeg"
+                                  className="hidden"
+                                />
+                                <Button variant="outline" type="button" onClick={() => logoInputRef.current?.click()} disabled={isUploadingLogo}>
+                                    {isUploadingLogo ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Upload className="mr-2 h-4 w-4"/>}
+                                    {isUploadingLogo ? 'Chargement...' : 'Changer de logo'}
+                                </Button>
+                           </div>
+                       </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="shop-name">Nom de la boutique</Label>
+                            <Input id="shop-name" placeholder="Ex: La Boutique du Bonheur" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="shop-description">Description de la boutique</Label>
+                            <Textarea id="shop-description" placeholder="Décrivez votre boutique, vos produits et ce qui vous rend unique." />
+                        </div>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                             <div className="space-y-2">
+                                <Label htmlFor="shop-email">Email de contact</Label>
+                                <Input id="shop-email" type="email" placeholder="contact@boutique.com" />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor="shop-phone">Téléphone de la boutique</Label>
+                                <Input id="shop-phone" type="tel" placeholder="+225 01 02 03 04 05" />
+                            </div>
+                        </div>
+                        <Button type="submit" className="w-full">Mettre à jour la boutique</Button>
+                    </form>
+                </CardContent>
+            </Card>
+
             {/* Transaction History Card */}
             <Card>
                 <CardHeader>
@@ -293,3 +396,5 @@ export default function SettingsPage() {
     </div>
   );
 }
+
+    
