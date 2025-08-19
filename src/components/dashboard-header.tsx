@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useQueryParams } from '@/hooks/use-query-params';
 import { Badge } from './ui/badge';
+import CartSheet from './cart-sheet';
 
 
 export default function DashboardHeader() {
@@ -80,13 +81,15 @@ export default function DashboardHeader() {
         />
       </div>
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" className="rounded-full relative">
-            <ShoppingCart className="h-5 w-5" />
-            {cartCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{cartCount}</Badge>
-            )}
-            <span className="sr-only">Panier</span>
-        </Button>
+        <CartSheet>
+          <Button variant="ghost" size="icon" className="rounded-full relative">
+              <ShoppingCart className="h-5 w-5" />
+              {cartCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{cartCount}</Badge>
+              )}
+              <span className="sr-only">Panier</span>
+          </Button>
+        </CartSheet>
         <Button variant="ghost" size="icon" className="rounded-full">
           <Bell className="h-5 w-5" />
           <span className="sr-only">Activer/désactiver les notifications</span>

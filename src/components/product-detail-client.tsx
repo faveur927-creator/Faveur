@@ -47,23 +47,28 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           title: "Produit ajouté au panier !",
           description: `${product.name} est maintenant dans votre panier.`,
         });
+        return true;
     } catch (error) {
         toast({
             variant: 'destructive',
             title: 'Erreur',
-            description: 'Impossible d\'ajouter le produit au panier.'
+            description: "Impossible d'ajouter le produit au panier."
         })
+        return false;
     }
   };
 
   const handleBuyNow = () => {
-    handleAddToCart();
-    // In a real app, this would redirect to a checkout page
-    // For now, we can just show a toast.
-    toast({
-        title: "Simulation d'achat",
-        description: "Le produit a été ajouté, vous seriez normalement redirigé vers le paiement.",
-    });
+    if(handleAddToCart()){
+      // In a real app, this would redirect to a checkout page
+      // For now, we can just show a toast.
+      // This part doesn't need to do anything anymore since the cart sheet handles checkout
+      // We could potentially open the cart sheet here.
+       toast({
+          title: "Ajouté au panier",
+          description: "Ouvrez le panier pour finaliser la commande.",
+      });
+    }
   }
 
   return (
@@ -75,7 +80,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                <BreadcrumbLink href="/marketplace">Marché</BreadcrumbLink>
+                <BreadcrumbLink href="/?tab=marketplace">Marché</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
