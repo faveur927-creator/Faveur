@@ -17,10 +17,8 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-
-const prisma = new PrismaClient();
 
 // Schema for user registration
 const RegisterUserInputSchema = z.object({
@@ -109,6 +107,10 @@ const loginUserFlow = ai.defineFlow(
                 return { error: "L'e-mail ou le mot de passe est incorrect." };
             }
 
+            if (!user.hashedPassword) {
+              return { error: "Le compte n'a pas de mot de passe configuré." };
+            }
+
             const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
 
             if (!isPasswordValid) {
@@ -160,7 +162,7 @@ const getUserDataFlow = ai.defineFlow(
             
             // Returning mock data as Account model is removed for now
             return {
-                name: user.name ?? undefined,
+                name: user.name,
                 email: user.email,
                 balance: 0,
                 currency: 'FCFA',
