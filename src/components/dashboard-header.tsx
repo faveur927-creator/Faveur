@@ -8,6 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function DashboardHeader() {
   const router = useRouter();
@@ -48,7 +49,9 @@ export default function DashboardHeader() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Paramètres</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+                <Link href="/dashboard/settings">Paramètres</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
