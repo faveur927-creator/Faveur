@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -24,8 +24,9 @@ export default function BuyCreditPage() {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [amount, setAmount] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('wallet');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSubmit = (event: React.FormEvent) => {
+    const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         const paymentAmount = parseFloat(amount);
 
@@ -38,8 +39,10 @@ export default function BuyCreditPage() {
             return;
         }
 
-        if (paymentMethod === 'wallet') {
-            try {
+        setIsSubmitting(true);
+
+        try {
+            if (paymentMethod === 'wallet') {
                 const currentBalance = parseFloat(localStorage.getItem('userBalance') || '0');
                 if (currentBalance < paymentAmount) {
                     toast({
@@ -52,17 +55,52 @@ export default function BuyCreditPage() {
                 const newBalance = currentBalance - paymentAmount;
                 localStorage.setItem('userBalance', newBalance.toString());
                 window.dispatchEvent(new Event('storage'));
-            } catch (e) {
-                console.error("Could not update balance", e);
-            }
-        }
-        
-        toast({
-            title: "Achat de crédit réussi (Simulation)",
-            description: `Recharge de ${paymentAmount.toLocaleString('fr-FR')} FCFA pour le numéro ${phoneNumber} (${operator}) effectuée.`,
-        });
+                
+                toast({
+                    title: "Achat de crédit réussi",
+                    description: `Recharge de ${paymentAmount.toLocaleString('fr-FR')} FCFA pour le numéro ${phoneNumber} (${operator}) effectuée.`,
+                });
+                router.push('/');
 
-        router.push('/');
+            } else if (paymentMethod === 'mtn_mobile_money') {
+                const response = await fetch('/api/pay', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount, phone: phoneNumber, externalId: `CREDIT_${Date.now()}` }),
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Erreur API MTN');
+                
+                toast({
+                    title: "Demande de paiement MTN initiée",
+                    description: `Veuillez confirmer le paiement sur votre téléphone. Réf: ${data.referenceId}`,
+                });
+                router.push('/');
+
+            } else if (paymentMethod === 'airtel_mobile_money') {
+                 const response = await fetch('/api/airtel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount, phone: phoneNumber }),
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Erreur API Airtel');
+
+                toast({
+                    title: "Demande de paiement Airtel initiée",
+                    description: `Veuillez confirmer le paiement sur votre téléphone. Réf: ${data.transactionId}`,
+                });
+                router.push('/');
+            }
+        } catch (error: any) {
+             toast({
+                variant: 'destructive',
+                title: 'Erreur de paiement',
+                description: error.message,
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -104,7 +142,7 @@ export default function BuyCreditPage() {
                             <Input
                                 id="phone-number"
                                 type="tel"
-                                placeholder="Ex: 0102030405"
+                                placeholder="Ex: 242061234567"
                                 required
                                 value={phoneNumber}
                                 onChange={(e) => setPhoneNumber(e.target.value)}
@@ -142,8 +180,9 @@ export default function BuyCreditPage() {
                                 </Label>
                             </RadioGroup>
                         </div>
-                        <Button type="submit" className="w-full" disabled={!amount || !phoneNumber}>
-                            Acheter maintenant
+                        <Button type="submit" className="w-full" disabled={!amount || !phoneNumber || isSubmitting}>
+                             {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null}
+                             {isSubmitting ? 'Traitement...' : 'Acheter maintenant'}
                         </Button>
                     </form>
                 </CardContent>

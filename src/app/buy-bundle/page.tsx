@@ -3,13 +3,15 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Package } from 'lucide-react';
+import { ArrowLeft, Package, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+
 
 const operators = [
     { id: 'MTN', name: 'MTN' },
@@ -50,11 +52,12 @@ export default function BuyBundlePage() {
     const [selectedBundleId, setSelectedBundleId] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('wallet');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const availableBundles = bundleTypes[operator as keyof typeof bundleTypes][bundleType as keyof typeof bundleTypes.MTN] || [];
     const selectedBundle = availableBundles.find(b => b.id === selectedBundleId);
 
-    const handleSubmit = (event: React.FormEvent) => {
+    const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         
         if (!selectedBundle) {
@@ -66,10 +69,20 @@ export default function BuyBundlePage() {
             return;
         }
 
-        const paymentAmount = selectedBundle.price;
+        if(!phoneNumber) {
+             toast({
+                variant: 'destructive',
+                title: 'Numéro de téléphone requis',
+                description: 'Veuillez saisir le numéro de téléphone bénéficiaire.',
+            });
+            return;
+        }
 
-        if (paymentMethod === 'wallet') {
-            try {
+        const paymentAmount = selectedBundle.price;
+        setIsSubmitting(true);
+
+        try {
+            if (paymentMethod === 'wallet') {
                 const currentBalance = parseFloat(localStorage.getItem('userBalance') || '0');
                 if (currentBalance < paymentAmount) {
                     toast({
@@ -82,17 +95,51 @@ export default function BuyBundlePage() {
                 const newBalance = currentBalance - paymentAmount;
                 localStorage.setItem('userBalance', newBalance.toString());
                 window.dispatchEvent(new Event('storage'));
-            } catch (e) {
-                console.error("Could not update balance", e);
-            }
-        }
-        
-        toast({
-            title: "Achat de forfait réussi (Simulation)",
-            description: `Achat de ${selectedBundle.name} pour ${paymentAmount.toLocaleString('fr-FR')} FCFA pour le numéro ${phoneNumber}.`,
-        });
+                 toast({
+                    title: "Achat de forfait réussi",
+                    description: `Achat de ${selectedBundle.name} pour ${paymentAmount.toLocaleString('fr-FR')} FCFA pour le numéro ${phoneNumber}.`,
+                });
+                router.push('/');
 
-        router.push('/');
+            } else if (paymentMethod === 'mtn_mobile_money') {
+                const response = await fetch('/api/pay', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: paymentAmount.toString(), phone: phoneNumber, externalId: `BUNDLE_${selectedBundle.id}_${Date.now()}` }),
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Erreur API MTN');
+                
+                toast({
+                    title: "Demande de paiement MTN initiée",
+                    description: `Veuillez confirmer le paiement sur votre téléphone. Réf: ${data.referenceId}`,
+                });
+                 router.push('/');
+
+            } else if (paymentMethod === 'airtel_mobile_money') {
+                 const response = await fetch('/api/airtel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: paymentAmount.toString(), phone: phoneNumber }),
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Erreur API Airtel');
+
+                toast({
+                    title: "Demande de paiement Airtel initiée",
+                    description: `Veuillez confirmer le paiement sur votre téléphone. Réf: ${data.transactionId}`,
+                });
+                router.push('/');
+            }
+        } catch (error: any) {
+             toast({
+                variant: 'destructive',
+                title: 'Erreur de paiement',
+                description: error.message,
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -155,6 +202,18 @@ export default function BuyBundlePage() {
                                 </SelectContent>
                             </Select>
                         </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="phone-number">Numéro de téléphone bénéficiaire</Label>
+                            <Input
+                                id="phone-number"
+                                type="tel"
+                                placeholder="Ex: 242061234567"
+                                required
+                                value={phoneNumber}
+                                onChange={(e) => setPhoneNumber(e.target.value)}
+                            />
+                        </div>
                         
                         <div className="space-y-2">
                             <Label>Méthode de paiement</Label>
@@ -174,8 +233,9 @@ export default function BuyBundlePage() {
                             </RadioGroup>
                         </div>
 
-                        <Button type="submit" className="w-full" disabled={!selectedBundle}>
-                             <Package className="mr-2 h-4 w-4" /> Acheter le forfait
+                        <Button type="submit" className="w-full" disabled={!selectedBundle || isSubmitting}>
+                             {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Package className="mr-2 h-4 w-4" />}
+                             {isSubmitting ? 'Traitement...' : 'Acheter le forfait'}
                         </Button>
                     </form>
                 </CardContent>
