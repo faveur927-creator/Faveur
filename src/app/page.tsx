@@ -14,27 +14,6 @@ import TransactionsPage from './transactions/page';
 import VendorSpace from '@/components/vendor-space';
 import { useSearchParams, useRouter } from 'next/navigation';
 
-function AuthGuard({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const authStatus = localStorage.getItem('userId');
-    if (!authStatus) {
-      router.push('/login');
-    } else {
-      setIsAuthenticated(true);
-    }
-  }, [router]);
-
-  if (!isAuthenticated) {
-    return null; // Affiche une page blanche ou un spinner pendant la redirection
-  }
-
-  return <>{children}</>;
-}
-
-
 function DashboardContent() {
   const [userName, setUserName] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -100,9 +79,23 @@ function DashboardContent() {
 
 
 export default function DashboardPage() {
-  return (
-      <AuthGuard>
-        <DashboardContent />
-      </AuthGuard>
-  )
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // This check should only run on the client side.
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      router.push('/login');
+    } else {
+      setIsLoading(false);
+    }
+  }, [router]);
+
+  if (isLoading) {
+    // Render nothing or a loading spinner while we check for auth status.
+    return null; 
+  }
+  
+  return <DashboardContent />;
 }
