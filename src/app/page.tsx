@@ -32,12 +32,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   }, [isClient, router]);
 
-  const userId = isClient ? localStorage.getItem('userId') : null;
-
-  if (!userId) {
-    // Affiche un loader ou rien pendant la vérification côté client
-    // pour éviter d'afficher le contenu protégé prématurément.
-    return <div>Chargement de la session...</div>;
+  if (!isClient || !localStorage.getItem('userId')) {
+    return <div>Chargement...</div>;
   }
 
   return <>{children}</>;

@@ -37,40 +37,14 @@ export default function RootLayout({
 }>) {
 
   const pathname = usePathname();
-  const router = useRouter();
   const noLayoutPages = ['/login', '/register'];
-  
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-  
-  const showLayout = isClient && !noLayoutPages.includes(pathname);
-
-  if (!isClient) {
-    // Render nothing or a loading skeleton on the server to avoid hydration mismatch
-    return (
-        <html lang="fr" suppressHydrationWarning>
-            <head>
-                <title>SuperApp</title>
-                <meta name="description" content="Votre application tout-en-un" />
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
-            </head>
-            <body className="font-body antialiased">
-                {/* Minimal layout to prevent FOUC */}
-            </body>
-        </html>
-    );
-  }
+  const showLayout = !noLayoutPages.includes(pathname);
 
   if (!showLayout) {
     return (
         <html lang="fr" suppressHydrationWarning>
             <head>
-                <title>SuperApp - Connexion</title>
+                <title>SuperApp - Authentification</title>
                 <meta name="description" content="Votre application tout-en-un" />
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
