@@ -59,26 +59,30 @@ export default function RegisterPage() {
         const user = result.user;
 
         if (user.email && user.displayName) {
-            const registerResult = await registerUser({ name: user.displayName, email: user.email, password: `google_auth_${user.uid}` });
+             const password = `google_auth_${user.uid}`;
+            let loginResult = await loginUser({ email: user.email, password });
 
-            if(registerResult.userId) {
-                const loginResult = await loginUser({ email: user.email, password: `google_auth_${user.uid}` });
-                if (loginResult.userId && loginResult.name) {
-                    localStorage.setItem('userName', loginResult.name);
-                    localStorage.setItem('userId', loginResult.userId);
-                    localStorage.setItem('userEmail', user.email);
-                    toast({ title: `Bienvenue, ${loginResult.name}!`, description: "Votre compte a été créé avec succès." });
-                    router.push('/');
-                } else {
-                     toast({ variant: "destructive", title: "Erreur de connexion", description: "Impossible de se connecter après l'inscription avec Google." });
+             if (loginResult.error) {
+                const registerResult = await registerUser({ name: user.displayName, email: user.email, password });
+                if (registerResult.error) {
+                    throw new Error(registerResult.error);
                 }
+                loginResult = await loginUser({ email: user.email, password });
+            }
+
+            if (loginResult.userId && loginResult.name) {
+                localStorage.setItem('userName', loginResult.name);
+                localStorage.setItem('userId', loginResult.userId);
+                localStorage.setItem('userEmail', user.email);
+                toast({ title: `Bienvenue, ${loginResult.name}!`, description: "Votre compte a été créé avec succès." });
+                router.push('/');
             } else {
-                 toast({ variant: "destructive", title: "Erreur d'inscription", description: "Impossible de créer un compte avec Google." });
+                 toast({ variant: "destructive", title: "Erreur de connexion", description: "Impossible de se connecter après l'inscription avec Google." });
             }
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Google Sign-in Error:", error);
-        toast({ variant: "destructive", title: "Erreur Google", description: "Une erreur est survenue lors de l'inscription avec Google." });
+        toast({ variant: "destructive", title: "Erreur Google", description: error.message || "Une erreur est survenue lors de l'inscription avec Google." });
     }
   }
 

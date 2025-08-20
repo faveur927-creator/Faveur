@@ -12,7 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { loginUser } from '@/ai/flows/user-actions';
+import { loginUser, registerUser } from '@/ai/flows/user-actions';
 import { auth, googleProvider, signInWithPopup } from '@/lib/firebase';
 import { Separator } from '@/components/ui/separator';
 
@@ -74,7 +74,18 @@ export default function LoginPage() {
 
         if (user.email && user.displayName) {
             // We use a special password to signify Google Auth in our mock backend
-            const loginResult = await loginUser({ email: user.email, password: `google_auth_${user.uid}` });
+            const password = `google_auth_${user.uid}`;
+            let loginResult = await loginUser({ email: user.email, password });
+
+            // If user doesn't exist, register them
+            if (loginResult.error) {
+                const registerResult = await registerUser({ name: user.displayName, email: user.email, password });
+                if (registerResult.error) {
+                    throw new Error(registerResult.error);
+                }
+                // Try logging in again after registration
+                loginResult = await loginUser({ email: user.email, password });
+            }
 
             if(loginResult.userId && loginResult.name) {
                 localStorage.setItem('userName', loginResult.name);
@@ -94,12 +105,12 @@ export default function LoginPage() {
                 });
             }
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Google Sign-in Error:", error);
         toast({
             variant: "destructive",
             title: "Erreur Google",
-            description: "Une erreur est survenue lors de la connexion avec Google.",
+            description: error.message || "Une erreur est survenue lors de la connexion avec Google.",
         });
     }
   }

@@ -123,6 +123,8 @@ const loginUserFlow = ai.defineFlow(
 
             const user = querySnapshot.docs[0].data();
 
+            // If the user signed up with Google, their password is a special key.
+            // We allow them to log in via Google button without entering it again.
             if (!password.startsWith('google_auth_')) {
               const isPasswordValid = user.password === password;
               if (!isPasswordValid) {
