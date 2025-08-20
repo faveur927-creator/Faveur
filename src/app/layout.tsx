@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import type { Metadata } from 'next';
@@ -22,8 +21,8 @@ import {
 import { Home, ShoppingCart, Wallet, Settings, Bell, Store, BarChart, Package, PlusCircle, LayoutGrid, Truck, ArrowRightLeft } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard-header';
 import Logo from '@/components/logo';
-import { usePathname, useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import React from 'react';
 
 // export const metadata: Metadata = {
 //   title: 'SuperApp',
@@ -35,28 +34,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   const pathname = usePathname();
-  const noLayoutPages = ['/login', '/register'];
-  const showLayout = !noLayoutPages.includes(pathname);
-
-  if (!showLayout) {
-    return (
-        <html lang="fr" suppressHydrationWarning>
-            <head>
-                <title>SuperApp - Authentification</title>
-                <meta name="description" content="Votre application tout-en-un" />
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
-            </head>
-            <body className="font-body antialiased">
-                {children}
-                <Toaster />
-            </body>
-        </html>
-    )
-  }
+  const isAuthPage = pathname === '/login' || pathname === '/register';
 
   return (
     <html lang="fr" suppressHydrationWarning>
@@ -68,6 +47,12 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
+        {isAuthPage ? (
+          <>
+            {children}
+            <Toaster />
+          </>
+        ) : (
           <SidebarProvider>
             <div className="min-h-screen w-full bg-background">
               <Sidebar>
@@ -187,6 +172,7 @@ export default function RootLayout({
               </main>
             </div>
           </SidebarProvider>
+        )}
         <Toaster />
       </body>
     </html>

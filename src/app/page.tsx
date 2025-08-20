@@ -24,7 +24,6 @@ function DashboardContent() {
 
   // User and account state
   const [userName, setUserName] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
   const [currency, setCurrency] = useState<string>('FCFA');
 
@@ -39,27 +38,24 @@ function DashboardContent() {
     }
 
     const fetchData = async () => {
-      setIsLoading(true);
       try {
         const data = await getUserData({ userId: storedUserId });
         if (data.error) {
            console.error("Session validation failed:", data.error);
-           // Any error from getUserData (not found, network issue, etc.) should lead to logout.
-           // No need to show a toast here, as it's a normal security flow.
+           toast({ variant: 'destructive', title: 'Session invalide', description: 'Veuillez vous reconnecter.' });
            localStorage.clear();
            router.push('/login');
         } else {
-          setUserId(storedUserId);
           setUserName(data.name || null);
           setBalance(data.balance || 0);
           setCurrency(data.currency || 'FCFA');
+          // Update localStorage with fresh data
           localStorage.setItem('userName', data.name || '');
           localStorage.setItem('userEmail', data.email || '');
           localStorage.setItem('userBalance', (data.balance || 0).toString());
         }
-      } catch (error) {
-        // This catch block handles critical failures in the flow itself.
-        toast({ variant: 'destructive', title: 'Erreur critique', description: 'Une erreur inattendue est survenue. Veuillez vous reconnecter.' });
+      } catch (error: any) {
+        toast({ variant: 'destructive', title: 'Erreur critique', description: `Une erreur inattendue est survenue: ${error.message}` });
         localStorage.clear();
         router.push('/login');
       } finally {
@@ -88,8 +84,8 @@ function DashboardContent() {
 
   if (isLoading) {
     return (
-        <div className="flex justify-center items-center min-h-screen">
-            <Loader2 className="h-16 w-16 animate-spin" />
+        <div className="flex justify-center items-center h-screen">
+            <Loader2 className="h-16 w-16 animate-spin text-primary" />
         </div>
     );
   }
@@ -151,7 +147,14 @@ export default function DashboardPage() {
         setIsClient(true);
     }, []);
 
-    // Render nothing on the server, and only render the content on the client
-    // This prevents hydration errors related to localStorage
-    return isClient ? <DashboardContent /> : null;
+    // Render a loader on the server and during initial client render to avoid hydration errors.
+    if (!isClient) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <Loader2 className="h-16 w-16 animate-spin text-primary" />
+            </div>
+        );
+    }
+    
+    return <DashboardContent />;
 }
