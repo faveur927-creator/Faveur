@@ -188,7 +188,8 @@ const getUserDataFlow = ai.defineFlow(
             };
         } catch (e: any) {
             console.error(e);
-            return { error: `Une erreur est survenue lors de la récupération des données: ${e.message}` };
+            const errorMessage = e instanceof Error ? e.message : String(e);
+            return { error: `Une erreur est survenue lors de la récupération des données: ${errorMessage}` };
         }
     }
 );

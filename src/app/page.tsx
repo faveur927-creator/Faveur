@@ -42,27 +42,35 @@ function DashboardContent() {
       try {
         const data = await getUserData({ userId: storedUserId });
         if (data.error) {
-          toast({ variant: 'destructive', title: 'Erreur de session', description: data.error });
-          localStorage.clear();
-          router.push('/login');
+            // Silently redirect if the client is offline or the user is not found,
+            // as this likely means the session is just invalid.
+            if (data.error.includes("offline") || data.error.includes("non trouvé")) {
+                 console.warn("Session validation failed, redirecting to login:", data.error);
+            } else {
+                // Show a toast for other, more critical errors.
+                toast({ variant: 'destructive', title: 'Erreur de session', description: data.error });
+            }
+            localStorage.clear();
+            router.push('/login');
         } else {
           setUserId(storedUserId);
           setUserName(data.name || null);
           setBalance(data.balance || 0);
           setCurrency(data.currency || 'FCFA');
           localStorage.setItem('userName', data.name || '');
+          localStorage.setItem('userEmail', data.email || '');
           localStorage.setItem('userBalance', (data.balance || 0).toString());
+          setIsLoading(false);
         }
       } catch (error) {
         toast({ variant: 'destructive', title: 'Erreur critique', description: 'Impossible de contacter le serveur.' });
         localStorage.clear();
         router.push('/login');
-      } finally {
-        setIsLoading(false);
       }
     };
 
     fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, toast]);
   
    const updateBalanceFromStorage = () => {
@@ -82,7 +90,7 @@ function DashboardContent() {
 
   if (isLoading) {
     return (
-        <div className="flex justify-center items-center h-screen">
+        <div className="flex justify-center items-center min-h-screen">
             <Loader2 className="h-16 w-16 animate-spin" />
         </div>
     );
