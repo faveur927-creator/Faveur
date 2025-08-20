@@ -19,7 +19,6 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Cette vérification ne s'exécute que côté client.
     const authStatus = localStorage.getItem('userId');
     if (!authStatus) {
       router.push('/login');
@@ -28,9 +27,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   }, [router]);
 
-  // Ne rend les enfants que si l'utilisateur est authentifié
   if (!isAuthenticated) {
-    return null; // Affiche une page blanche ou un spinner pendant la vérification
+    return null; // Affiche une page blanche ou un spinner pendant la redirection
   }
 
   return <>{children}</>;
