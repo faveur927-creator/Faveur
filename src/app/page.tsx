@@ -22,6 +22,7 @@ function DashboardContent() {
   const defaultTab = searchParams.get('tab') || 'overview';
 
   useEffect(() => {
+    // This code runs only on the client, after the component mounts
     const storedUserId = localStorage.getItem('userId');
     const storedUserName = localStorage.getItem('userName');
     setUserId(storedUserId);
