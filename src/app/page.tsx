@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import BalanceCard from '@/components/balance-card';
@@ -13,6 +14,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TransactionsPage from './dashboard/transactions/page';
 import VendorSpace from '@/components/vendor-space';
 import { useSearchParams, useRouter } from 'next/navigation';
+
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const [isVerified, setIsVerified] = useState(false);
+
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      router.push('/login');
+    } else {
+      setIsVerified(true);
+    }
+  }, [router]);
+
+  if (!isVerified) {
+    return null; // or a loading spinner
+  }
+
+  return <>{children}</>;
+}
+
 
 function DashboardContent() {
   const [userName, setUserName] = useState<string | null>(null);
@@ -81,7 +103,9 @@ function DashboardContent() {
 export default function DashboardPage() {
   return (
     <Suspense fallback={<div>Chargement...</div>}>
-      <DashboardContent />
+      <AuthGuard>
+        <DashboardContent />
+      </AuthGuard>
     </Suspense>
   )
 }

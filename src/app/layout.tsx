@@ -41,12 +41,39 @@ export default function RootLayout({
   const noLayoutPages = ['/login', '/register'];
   const showLayout = !noLayoutPages.includes(pathname);
   
+  const [isClient, setIsClient] = React.useState(false);
+
   useEffect(() => {
-    const userId = localStorage.getItem('userId');
-    if (!userId && !noLayoutPages.includes(pathname)) {
-        router.push('/login');
-    }
-  }, [pathname, router]);
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return (
+      <html lang="fr" suppressHydrationWarning>
+        <head>
+            <title>SuperApp</title>
+        </head>
+        <body className="font-body antialiased">
+        </body>
+      </html>
+    )
+  }
+
+  const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+
+  if (!userId && !noLayoutPages.includes(pathname)) {
+      if (typeof window !== 'undefined') {
+          router.push('/login');
+      }
+      return (
+          <html lang="fr" suppressHydrationWarning>
+               <head>
+                  <title>Redirection...</title>
+               </head>
+               <body className="font-body antialiased"></body>
+          </html>
+      );
+  }
 
 
   if (!showLayout) {
