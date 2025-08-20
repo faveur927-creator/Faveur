@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview User management flows for registration and login.
+ * @fileOverview User management flows for registration and login using Prisma.
  *
  * - registerUser - Creates a new user in the database.
  * - RegisterUserInput - The input type for the registerUser function.
@@ -21,9 +21,8 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-
-// In-memory user store for demonstration
-const users: any[] = [];
+import prisma from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 // Schema for user registration
 const RegisterUserInputSchema = z.object({
@@ -51,26 +50,36 @@ const registerUserFlow = ai.defineFlow(
   },
   async ({ name, email, password }) => {
     try {
-      const existingUser = users.find(user => user.email === email);
+      const existingUser = await prisma.user.findUnique({
+        where: { email },
+      });
 
       if (existingUser) {
-        // If user exists, consider it a successful login and return their ID.
-        return { userId: existingUser.id };
+        return { error: "Un utilisateur avec cet e-mail existe déjà." };
       }
       
-      const newUser = {
-        id: `user_${Date.now()}`,
-        name,
-        email,
-        password, // In a real app, hash this!
-      };
-
-      users.push(newUser);
-      console.log('Users in memory:', users);
+      const newUser = await prisma.user.create({
+        data: {
+          name,
+          email,
+          password, // In a real app, hash this!
+          accounts: {
+            create: {
+              balance: 123456.78, // Initial balance for new users
+              currency: 'FCFA',
+            }
+          }
+        },
+      });
 
       return { userId: newUser.id };
     } catch (e) {
       console.error(e);
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2002') {
+             return { error: "Un utilisateur avec cet e-mail existe déjà." };
+        }
+      }
       return { error: "Une erreur est survenue lors de la création du compte." };
     }
   }
@@ -103,14 +112,14 @@ const loginUserFlow = ai.defineFlow(
     },
     async ({ email, password }) => {
         try {
-            const user = users.find(u => u.email === email);
-            console.log('Attempting login for:', email, 'Found user:', user);
+            const user = await prisma.user.findUnique({
+                where: { email },
+            });
 
             if (!user) {
                 return { error: "L'e-mail ou le mot de passe est incorrect." };
             }
 
-            // For google auth, we skip password check
             if (!password.startsWith('google_auth_')) {
               const isPasswordValid = user.password === password;
 
@@ -118,8 +127,7 @@ const loginUserFlow = ai.defineFlow(
                   return { error: "L'e-mail ou le mot de passe est incorrect." };
               }
             }
-
-
+            
             return { userId: user.id, name: user.name };
         } catch (e) {
             console.error(e);
@@ -155,17 +163,20 @@ const getUserDataFlow = ai.defineFlow(
     },
     async ({ userId }) => {
         try {
-            const user = users.find(u => u.id === userId);
-
-            if (!user) {
-                return { error: "Utilisateur non trouvé." };
+            const account = await prisma.account.findFirst({
+                where: { userId },
+                include: { user: true },
+            });
+            
+            if (!account || !account.user) {
+                return { error: "Utilisateur ou compte non trouvé." };
             }
             
             return {
-                name: user.name,
-                email: user.email,
-                balance: 123456.78, // Mock balance
-                currency: 'FCFA',
+                name: account.user.name,
+                email: account.user.email,
+                balance: account.balance,
+                currency: account.currency,
             };
         } catch (e) {
             console.error(e);
@@ -173,6 +184,7 @@ const getUserDataFlow = ai.defineFlow(
         }
     }
 );
+
 
 // Schema for sending OTP
 const SendOtpInputSchema = z.object({
@@ -198,13 +210,14 @@ const sendOtpFlow = ai.defineFlow(
   },
   async ({ email }) => {
     try {
-      // In a real app, you would integrate with an email service like SendGrid here.
-      // For this simulation, we'll just generate a random 6-digit code.
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      console.log(`OTP for ${email} is: ${otp}`); // Log for debugging
+      const existingUser = await prisma.user.findUnique({ where: { email } });
+      if (existingUser) {
+        return { error: "Un utilisateur avec cet e-mail existe déjà." }
+      }
 
-      // We return the OTP so the frontend can display it for testing.
-      // In a real app, you would not return the OTP.
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      console.log(`OTP for ${email} is: ${otp}`); 
+
       return { otp };
 
     } catch (e) {
