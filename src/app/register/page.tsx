@@ -12,7 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { registerUser, loginUser, sendOtp } from '@/ai/flows/user-actions';
+import { registerUser, sendOtp } from '@/ai/flows/user-actions';
 import React from 'react';
 import OtpForm from '@/components/otp-form';
 
@@ -67,9 +67,14 @@ export default function RegisterPage() {
       try {
         const registerResult = await registerUser(registrationData);
 
-        if (registerResult.userId) {
-          toast({ title: "Inscription réussie !", description: "Vous pouvez maintenant vous connecter." });
-          router.push('/login'); // Redirect to login page after successful registration
+        if (registerResult.userId && registerResult.name) {
+          toast({ title: "Inscription réussie !", description: "Bienvenue sur SuperApp!" });
+          
+          // Automatically log the user in by setting localStorage
+          localStorage.setItem('userId', registerResult.userId);
+          localStorage.setItem('userName', registerResult.name);
+
+          router.push('/'); // Redirect to dashboard
         } else {
             toast({ variant: "destructive", title: "Erreur d'inscription", description: registerResult.error });
             setStep('register'); // Go back to registration form on error

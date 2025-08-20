@@ -36,6 +36,7 @@ export type RegisterUserInput = z.infer<typeof RegisterUserInputSchema>;
 
 const RegisterUserOutputSchema = z.object({
   userId: z.string().optional(),
+  name: z.string().optional(),
   error: z.string().optional(),
 });
 export type RegisterUserOutput = z.infer<typeof RegisterUserOutputSchema>;
@@ -79,7 +80,7 @@ const registerUserFlow = ai.defineFlow(
       });
 
 
-      return { userId: userId };
+      return { userId: userId, name: name };
     } catch (e: any) {
       console.error("registerUserFlow Error:", e);
       const errorMessage = e instanceof Error ? e.message : String(e);
