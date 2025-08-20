@@ -17,23 +17,23 @@ import { useSearchParams, useRouter } from 'next/navigation';
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [isClient, setIsClient] = useState(false);
+  const [isAuth, setIsAuth] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (isClient) {
-        const userId = localStorage.getItem('userId');
-        if (!userId) {
-            router.push('/login');
-        }
+    // We need to check for the auth key in localStorage.
+    // This code will only run on the client side, after hydration.
+    const authStatus = localStorage.getItem('userId');
+    if (!authStatus) {
+      router.push('/login');
+    } else {
+        setIsAuth(true);
     }
-  }, [isClient, router]);
+  }, [router]);
 
-  if (!isClient || !localStorage.getItem('userId')) {
-    return <div>Chargement...</div>;
+  // If the user is not authenticated, we render nothing to avoid flashing the dashboard.
+  // The useEffect above will handle the redirection.
+  if (!isAuth) {
+    return null; 
   }
 
   return <>{children}</>;
