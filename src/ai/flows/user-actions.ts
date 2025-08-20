@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview User management flows for registration and login using Prisma.
+ * @fileOverview User management flows for registration and login using Firestore.
  *
  * - registerUser - Creates a new user in the database.
  * - RegisterUserInput - The input type for the registerUser function.
@@ -21,8 +21,9 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import prisma from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
+import { firestore } from '@/lib/firebase';
+import { collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
+
 
 // Schema for user registration
 const RegisterUserInputSchema = z.object({
@@ -50,37 +51,37 @@ const registerUserFlow = ai.defineFlow(
   },
   async ({ name, email, password }) => {
     try {
-      const existingUser = await prisma.user.findUnique({
-        where: { email },
-      });
+      const usersRef = collection(firestore, "users");
+      const q = query(usersRef, where("email", "==", email));
+      const querySnapshot = await getDocs(q);
 
-      if (existingUser) {
+      if (!querySnapshot.empty) {
         return { error: "Un utilisateur avec cet e-mail existe déjà." };
       }
       
-      const newUser = await prisma.user.create({
-        data: {
-          name,
-          email,
-          password, // In a real app, hash this!
-          accounts: {
-            create: {
-              balance: 123456.78, // Initial balance for new users
-              currency: 'FCFA',
-            }
-          }
-        },
+      const userId = doc(collection(firestore, 'users')).id;
+      const userDocRef = doc(firestore, "users", userId);
+      
+      await setDoc(userDocRef, {
+        id: userId,
+        name,
+        email,
+        password, // In a real app, hash this!
       });
 
-      return { userId: newUser.id };
-    } catch (e) {
+      // Create a corresponding account document
+      const accountDocRef = doc(firestore, "accounts", userId);
+      await setDoc(accountDocRef, {
+          userId: userId,
+          balance: 123456.78, // Initial balance for new users
+          currency: 'FCFA',
+      });
+
+
+      return { userId: userId };
+    } catch (e: any) {
       console.error(e);
-      if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') {
-             return { error: "Un utilisateur avec cet e-mail existe déjà." };
-        }
-      }
-      return { error: "Une erreur est survenue lors de la création du compte." };
+      return { error: `Une erreur est survenue lors de la création du compte: ${e.message}` };
     }
   }
 );
@@ -112,26 +113,27 @@ const loginUserFlow = ai.defineFlow(
     },
     async ({ email, password }) => {
         try {
-            const user = await prisma.user.findUnique({
-                where: { email },
-            });
+            const usersRef = collection(firestore, "users");
+            const q = query(usersRef, where("email", "==", email));
+            const querySnapshot = await getDocs(q);
 
-            if (!user) {
+            if (querySnapshot.empty) {
                 return { error: "L'e-mail ou le mot de passe est incorrect." };
             }
 
+            const user = querySnapshot.docs[0].data();
+
             if (!password.startsWith('google_auth_')) {
               const isPasswordValid = user.password === password;
-
               if (!isPasswordValid) {
                   return { error: "L'e-mail ou le mot de passe est incorrect." };
               }
             }
             
             return { userId: user.id, name: user.name };
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
-            return { error: "Une erreur est survenue lors de la connexion." };
+            return { error: `Une erreur est survenue lors de la connexion: ${e.message}` };
         }
     }
 );
@@ -163,24 +165,28 @@ const getUserDataFlow = ai.defineFlow(
     },
     async ({ userId }) => {
         try {
-            const account = await prisma.account.findFirst({
-                where: { userId },
-                include: { user: true },
-            });
-            
-            if (!account || !account.user) {
+            const userDocRef = doc(firestore, "users", userId);
+            const accountDocRef = doc(firestore, "accounts", userId);
+
+            const userDoc = await getDoc(userDocRef);
+            const accountDoc = await getDoc(accountDocRef);
+
+            if (!userDoc.exists() || !accountDoc.exists()) {
                 return { error: "Utilisateur ou compte non trouvé." };
             }
             
+            const userData = userDoc.data();
+            const accountData = accountDoc.data();
+
             return {
-                name: account.user.name,
-                email: account.user.email,
-                balance: account.balance,
-                currency: account.currency,
+                name: userData.name,
+                email: userData.email,
+                balance: accountData.balance,
+                currency: accountData.currency,
             };
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
-            return { error: "Une erreur est survenue lors de la récupération des données." };
+            return { error: `Une erreur est survenue lors de la récupération des données: ${e.message}` };
         }
     }
 );
@@ -210,19 +216,22 @@ const sendOtpFlow = ai.defineFlow(
   },
   async ({ email }) => {
     try {
-      const existingUser = await prisma.user.findUnique({ where: { email } });
-      if (existingUser) {
-        return { error: "Un utilisateur avec cet e-mail existe déjà." }
-      }
+        const usersRef = collection(firestore, "users");
+        const q = query(usersRef, where("email", "==", email));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            return { error: "Un utilisateur avec cet e-mail existe déjà." }
+        }
 
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       console.log(`OTP for ${email} is: ${otp}`); 
 
       return { otp };
 
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      return { error: "Une erreur est survenue lors de l'envoi de l'OTP." };
+      return { error: `Une erreur est survenue lors de l'envoi de l'OTP: ${e.message}` };
     }
   }
 );
