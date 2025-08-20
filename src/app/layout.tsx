@@ -49,6 +49,24 @@ export default function RootLayout({
   }, [pathname, router]);
 
 
+  if (!showLayout) {
+    return (
+        <html lang="fr" suppressHydrationWarning>
+            <head>
+                <title>SuperApp - Connexion</title>
+                <meta name="description" content="Votre application tout-en-un" />
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
+            </head>
+            <body className="font-body antialiased">
+                {children}
+                <Toaster />
+            </body>
+        </html>
+    )
+  }
+
   return (
     <html lang="fr" suppressHydrationWarning>
       <head>
@@ -59,7 +77,6 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        {showLayout ? (
           <SidebarProvider>
             <div className="min-h-screen w-full bg-background">
               <Sidebar>
@@ -179,11 +196,6 @@ export default function RootLayout({
               </main>
             </div>
           </SidebarProvider>
-        ) : (
-          <>
-            {children}
-          </>
-        )}
         <Toaster />
       </body>
     </html>
