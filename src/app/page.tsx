@@ -13,6 +13,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TransactionsPage from './transactions/page';
 import VendorSpace from '@/components/vendor-space';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { getUserData } from '@/ai/flows/user-actions';
+import { useToast } from '@/hooks/use-toast';
+
 
 function DashboardContent() {
   const [userName, setUserName] = useState<string | null>(null);

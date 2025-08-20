@@ -23,6 +23,16 @@ export default function DashboardHeader() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const { createQueryString } = useQueryParams();
   const [cartCount, setCartCount] = useState(0);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
+
+  useEffect(() => {
+    const name = localStorage.getItem('userName');
+    const avatar = localStorage.getItem('userAvatar');
+    setUserName(name);
+    setUserAvatar(avatar);
+  }, []);
+
 
   const updateCartCount = () => {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -35,8 +45,17 @@ export default function DashboardHeader() {
     
     // Listen for storage changes to update cart count across components
     window.addEventListener('storage', updateCartCount);
+    window.addEventListener('storage', () => {
+        setUserName(localStorage.getItem('userName'));
+        setUserAvatar(localStorage.getItem('userAvatar'));
+    });
+
     return () => {
       window.removeEventListener('storage', updateCartCount);
+      window.removeEventListener('storage', () => {
+        setUserName(localStorage.getItem('userName'));
+        setUserAvatar(localStorage.getItem('userAvatar'));
+    });
     };
   }, []);
 
@@ -98,8 +117,8 @@ export default function DashboardHeader() {
           <DropdownMenuTrigger asChild>
              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="@user" />
-                  <AvatarFallback>U</AvatarFallback>
+                  <AvatarImage src={userAvatar || undefined} alt={userName || "U"} />
+                  <AvatarFallback>{userName?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
                 </Avatar>
               </Button>
           </DropdownMenuTrigger>

@@ -68,9 +68,14 @@ export default function BalanceCard({ userId }: { userId: string | null }) {
       };
       fetchBalance();
     } else {
+        // If there's no userId, try to get balance from local storage, or default to 0
+        const storedBalance = localStorage.getItem('userBalance');
+        if (storedBalance) {
+            setBalance(parseFloat(storedBalance));
+        } else {
+            setBalance(0);
+        }
         setIsLoading(false);
-        setBalance(0);
-        localStorage.setItem('userBalance', '0');
     }
   }, [userId, toast]);
 
@@ -303,4 +308,3 @@ export default function BalanceCard({ userId }: { userId: string | null }) {
     </Card>
   );
 }
-
