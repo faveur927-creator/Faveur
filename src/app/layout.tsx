@@ -23,7 +23,7 @@ import { Home, ShoppingCart, Wallet, Settings, Bell, Store, BarChart, Package, P
 import DashboardHeader from '@/components/dashboard-header';
 import Logo from '@/components/logo';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 // export const metadata: Metadata = {
 //   title: 'SuperApp',
@@ -37,32 +37,33 @@ export default function RootLayout({
 }>) {
 
   const pathname = usePathname();
+  const router = useRouter();
   const noLayoutPages = ['/login', '/register'];
-  const showLayout = !noLayoutPages.includes(pathname);
+  
+  const [isClient, setIsClient] = useState(false);
 
-  // This prevents hydration errors by ensuring that client-specific logic
-  // runs only after the component has mounted on the client.
-  const [isClient, setIsClient] = React.useState(false);
   useEffect(() => {
     setIsClient(true);
   }, []);
+  
+  const showLayout = isClient && !noLayoutPages.includes(pathname);
 
   if (!isClient) {
-    // Render a static layout on the server or during the initial client render
+    // Render nothing or a loading skeleton on the server to avoid hydration mismatch
     return (
-       <html lang="fr" suppressHydrationWarning>
-         <head>
-           <title>SuperApp</title>
-           <meta name="description" content="Votre application tout-en-un" />
-           <link rel="preconnect" href="https://fonts.googleapis.com" />
-           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-           <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
-         </head>
-         <body className="font-body antialiased">
-            {/* You can add a loading skeleton here if you want */}
-         </body>
-       </html>
-    )
+        <html lang="fr" suppressHydrationWarning>
+            <head>
+                <title>SuperApp</title>
+                <meta name="description" content="Votre application tout-en-un" />
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
+            </head>
+            <body className="font-body antialiased">
+                {/* Minimal layout to prevent FOUC */}
+            </body>
+        </html>
+    );
   }
 
   if (!showLayout) {

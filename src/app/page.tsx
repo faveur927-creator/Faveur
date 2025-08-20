@@ -17,21 +17,27 @@ import { useSearchParams, useRouter } from 'next/navigation';
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [isVerified, setIsVerified] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // This effect runs only on the client side
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-      router.push('/login');
-    } else {
-      setIsVerified(true);
-    }
-  }, [router]);
+    setIsClient(true);
+  }, []);
 
-  if (!isVerified) {
-    // You can return a loading spinner here while the check is running
-    return null; 
+  useEffect(() => {
+    if (isClient) {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            router.push('/login');
+        }
+    }
+  }, [isClient, router]);
+
+  const userId = isClient ? localStorage.getItem('userId') : null;
+
+  if (!userId) {
+    // Affiche un loader ou rien pendant la vérification côté client
+    // pour éviter d'afficher le contenu protégé prématurément.
+    return <div>Chargement de la session...</div>;
   }
 
   return <>{children}</>;
