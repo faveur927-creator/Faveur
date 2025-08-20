@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import BalanceCard from '@/components/balance-card';
@@ -18,19 +17,26 @@ import { useSearchParams, useRouter } from 'next/navigation';
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    const authStatus = localStorage.getItem('userId');
-    if (!authStatus) {
-      router.push('/login');
-    } else {
-      setIsAuthenticated(true);
+    setIsClient(true);
+  }, []);
+  
+  useEffect(() => {
+    if (isClient) {
+      const authStatus = localStorage.getItem('userId');
+      if (!authStatus) {
+        router.push('/login');
+      } else {
+        setIsAuthenticated(true);
+      }
     }
-  }, [router]);
+  }, [isClient, router]);
 
-  // Ne rend les enfants que si l'utilisateur est authentifié
-  if (!isAuthenticated) {
-    return null; // Ou un spinner de chargement
+  // Ne rend les enfants que si l'utilisateur est authentifié et que nous sommes côté client
+  if (!isAuthenticated || !isClient) {
+    return null; // Affiche une page blanche ou un spinner pendant la vérification
   }
 
   return <>{children}</>;
