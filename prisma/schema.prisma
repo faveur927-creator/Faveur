@@ -12,9 +12,9 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid())
+  name      String?
   email     String   @unique
-  name      String
-  password  String // In a real app, this should be hashed
+  password  String
   accounts  Account[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -23,9 +23,11 @@ model User {
 model Account {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
   balance   Float
   currency  String
+  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
