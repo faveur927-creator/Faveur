@@ -7,7 +7,7 @@ import QuickActions from '@/components/quick-actions';
 import RecentTransactions from '@/components/recent-transactions';
 import ExpensesChart from '@/components/expenses-chart';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal } from 'lucide-react';
+import { Terminal, Loader2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TransactionsPage from './transactions/page';
@@ -18,19 +18,75 @@ import { useToast } from '@/hooks/use-toast';
 
 
 function DashboardContent() {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
+
+  // User and account state
   const [userName, setUserName] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  
+  const [balance, setBalance] = useState<number | null>(null);
+  const [currency, setCurrency] = useState<string>('FCFA');
+
   const searchParams = useSearchParams();
   const defaultTab = searchParams.get('tab') || 'overview';
 
   useEffect(() => {
-    // This code runs only on the client, after the component mounts
     const storedUserId = localStorage.getItem('userId');
-    const storedUserName = localStorage.getItem('userName');
-    setUserId(storedUserId);
-    setUserName(storedUserName);
+    if (!storedUserId) {
+      router.push('/login');
+      return;
+    }
+
+    const fetchData = async () => {
+      try {
+        const data = await getUserData({ userId: storedUserId });
+        if (data.error) {
+          toast({ variant: 'destructive', title: 'Erreur de session', description: data.error });
+          localStorage.clear();
+          router.push('/login');
+        } else {
+          setUserId(storedUserId);
+          setUserName(data.name || null);
+          setBalance(data.balance || 0);
+          setCurrency(data.currency || 'FCFA');
+          localStorage.setItem('userName', data.name || '');
+          localStorage.setItem('userBalance', (data.balance || 0).toString());
+        }
+      } catch (error) {
+        toast({ variant: 'destructive', title: 'Erreur critique', description: 'Impossible de contacter le serveur.' });
+        localStorage.clear();
+        router.push('/login');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [router, toast]);
+  
+   const updateBalanceFromStorage = () => {
+    const storedBalance = localStorage.getItem('userBalance');
+    if (storedBalance !== null) {
+      setBalance(parseFloat(storedBalance));
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('storage', updateBalanceFromStorage);
+    return () => {
+      window.removeEventListener('storage', updateBalanceFromStorage);
+    };
   }, []);
+
+
+  if (isLoading) {
+    return (
+        <div className="flex justify-center items-center h-screen">
+            <Loader2 className="h-16 w-16 animate-spin" />
+        </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -58,7 +114,7 @@ function DashboardContent() {
         <TabsContent value="overview" className="mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
-                <BalanceCard userId={userId} />
+                <BalanceCard balance={balance} currency={currency} isLoading={isLoading} />
                 <QuickActions />
                 <RecentTransactions />
                 </div>
@@ -81,25 +137,15 @@ function DashboardContent() {
   );
 }
 
-
+// This wrapper component handles the client-side auth check
 export default function DashboardPage() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+    const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    // This check should only run on the client side.
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-      router.push('/login');
-    } else {
-      setIsLoading(false);
-    }
-  }, [router]);
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
-  if (isLoading) {
-    // Render nothing or a loading spinner while we check for auth status.
-    return null; 
-  }
-  
-  return <DashboardContent />;
+    // Render nothing on the server, and only render the content on the client
+    // This prevents hydration errors related to localStorage
+    return isClient ? <DashboardContent /> : null;
 }

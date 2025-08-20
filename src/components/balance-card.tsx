@@ -9,14 +9,16 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { DollarSign, ArrowDownCircle, ArrowUpCircle, Send, Loader2, Landmark, Smartphone, CreditCard } from 'lucide-react';
 import React from 'react';
-import { getUserData } from "@/ai/flows/user-actions";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 
-export default function BalanceCard({ userId }: { userId: string | null }) {
+interface BalanceCardProps {
+  balance: number | null;
+  currency: string;
+  isLoading: boolean;
+}
+
+export default function BalanceCard({ balance, currency, isLoading }: BalanceCardProps) {
   const { toast } = useToast();
-  const [balance, setBalance] = React.useState<number | null>(null);
-  const [currency, setCurrency] = React.useState<string>('FCFA');
-  const [isLoading, setIsLoading] = React.useState(true);
   
   // State for modals
   const [depositAmount, setDepositAmount] = React.useState<number | string>('');
@@ -28,69 +30,17 @@ export default function BalanceCard({ userId }: { userId: string | null }) {
   const [transferAmount, setTransferAmount] = React.useState<number | string>('');
   const [transferRecipient, setTransferRecipient] = React.useState('');
 
-  const updateBalanceFromStorage = () => {
-    const storedBalance = localStorage.getItem('userBalance');
-    if (storedBalance !== null) {
-      setBalance(parseFloat(storedBalance));
-    }
-  };
-
-  React.useEffect(() => {
-    // Listen for storage changes to update balance across components
-    window.addEventListener('storage', updateBalanceFromStorage);
-    return () => {
-      window.removeEventListener('storage', updateBalanceFromStorage);
-    };
-  }, []);
-  
-  React.useEffect(() => {
-    if (userId) {
-      const fetchBalance = async () => {
-        setIsLoading(true);
-        try {
-            const data = await getUserData({ userId });
-            if (data.balance !== undefined && data.balance !== null) {
-              setBalance(data.balance);
-              setCurrency(data.currency || 'FCFA');
-              localStorage.setItem('userBalance', data.balance.toString());
-            } else if (data.error) {
-              toast({ variant: "destructive", title: "Erreur", description: data.error });
-              setBalance(0);
-              localStorage.setItem('userBalance', '0');
-            }
-        } catch (error) {
-          console.error(error);
-          toast({ variant: "destructive", title: "Erreur inattendue", description: "Impossible de récupérer le solde." });
-          setBalance(0);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      fetchBalance();
-    } else {
-        // If there's no userId, try to get balance from local storage, or default to 0
-        const storedBalance = localStorage.getItem('userBalance');
-        if (storedBalance) {
-            setBalance(parseFloat(storedBalance));
-        } else {
-            setBalance(0);
-        }
-        setIsLoading(false);
-    }
-  }, [userId, toast]);
-
-
   const handleDeposit = (e: React.FormEvent) => {
     e.preventDefault();
     const amount = Number(depositAmount);
     if(amount > 0 && balance !== null) {
-      const newBalance = (balance || 0) + amount;
-      setBalance(newBalance);
+      const currentBalance = parseFloat(localStorage.getItem('userBalance') || '0');
+      const newBalance = currentBalance + amount;
       localStorage.setItem('userBalance', newBalance.toString());
-      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new Event('storage')); // Notify other components
 
       toast({
-        title: "Dépôt réussi",
+        title: "Dépôt réussi (Simulation)",
         description: `${amount.toLocaleString('fr-FR')} ${currency} ont été ajoutés à votre compte.`,
       });
     }
@@ -100,18 +50,18 @@ export default function BalanceCard({ userId }: { userId: string | null }) {
   const handleWithdrawal = (e: React.FormEvent) => {
     e.preventDefault();
     const amount = Number(withdrawalAmount);
-    if (amount <= 0) {
+     if (amount <= 0) {
       toast({ variant: "destructive", title: "Montant invalide" });
       return;
     }
-    if (balance !== null && balance >= amount) {
-       const newBalance = balance - amount;
-       setBalance(newBalance);
+    const currentBalance = parseFloat(localStorage.getItem('userBalance') || '0');
+    if (currentBalance >= amount) {
+       const newBalance = currentBalance - amount;
        localStorage.setItem('userBalance', newBalance.toString());
        window.dispatchEvent(new Event('storage'));
 
        toast({
-         title: "Retrait réussi",
+         title: "Retrait réussi (Simulation)",
          description: `${amount.toLocaleString('fr-FR')} ${currency} ont été retirés de votre compte.`,
        });
     } else {
@@ -127,14 +77,14 @@ export default function BalanceCard({ userId }: { userId: string | null }) {
       toast({ variant: "destructive", title: "Données invalides", description: "Veuillez entrer un destinataire et un montant valide." });
       return;
     }
-    if (balance !== null && balance >= amount) {
-       const newBalance = balance - amount;
-       setBalance(newBalance);
+    const currentBalance = parseFloat(localStorage.getItem('userBalance') || '0');
+    if (currentBalance >= amount) {
+       const newBalance = currentBalance - amount;
        localStorage.setItem('userBalance', newBalance.toString());
        window.dispatchEvent(new Event('storage'));
 
        toast({
-         title: "Transfert réussi",
+         title: "Transfert réussi (Simulation)",
          description: `${amount.toLocaleString('fr-FR')} ${currency} ont été envoyés à ${transferRecipient}.`,
        });
     } else {
