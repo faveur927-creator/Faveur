@@ -37,44 +37,33 @@ export default function RootLayout({
 }>) {
 
   const pathname = usePathname();
-  const router = useRouter();
   const noLayoutPages = ['/login', '/register'];
   const showLayout = !noLayoutPages.includes(pathname);
-  
-  const [isClient, setIsClient] = React.useState(false);
 
+  // This prevents hydration errors by ensuring that client-specific logic
+  // runs only after the component has mounted on the client.
+  const [isClient, setIsClient] = React.useState(false);
   useEffect(() => {
     setIsClient(true);
   }, []);
 
   if (!isClient) {
+    // Render a static layout on the server or during the initial client render
     return (
-      <html lang="fr" suppressHydrationWarning>
-        <head>
-            <title>SuperApp</title>
-        </head>
-        <body className="font-body antialiased">
-        </body>
-      </html>
+       <html lang="fr" suppressHydrationWarning>
+         <head>
+           <title>SuperApp</title>
+           <meta name="description" content="Votre application tout-en-un" />
+           <link rel="preconnect" href="https://fonts.googleapis.com" />
+           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+           <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
+         </head>
+         <body className="font-body antialiased">
+            {/* You can add a loading skeleton here if you want */}
+         </body>
+       </html>
     )
   }
-
-  const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
-
-  if (!userId && !noLayoutPages.includes(pathname)) {
-      if (typeof window !== 'undefined') {
-          router.push('/login');
-      }
-      return (
-          <html lang="fr" suppressHydrationWarning>
-               <head>
-                  <title>Redirection...</title>
-               </head>
-               <body className="font-body antialiased"></body>
-          </html>
-      );
-  }
-
 
   if (!showLayout) {
     return (

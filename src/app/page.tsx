@@ -20,6 +20,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
+    // This effect runs only on the client side
     const userId = localStorage.getItem('userId');
     if (!userId) {
       router.push('/login');
@@ -29,7 +30,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [router]);
 
   if (!isVerified) {
-    return null; // or a loading spinner
+    // You can return a loading spinner here while the check is running
+    return null; 
   }
 
   return <>{children}</>;
