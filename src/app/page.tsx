@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import BalanceCard from '@/components/balance-card';
