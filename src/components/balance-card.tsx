@@ -48,11 +48,6 @@ export default function BalanceCard({ userId }: { userId: string | null }) {
       const fetchBalance = async () => {
         setIsLoading(true);
         try {
-          const storedBalance = localStorage.getItem('userBalance');
-          if (storedBalance) {
-            setBalance(parseFloat(storedBalance));
-            setCurrency('FCFA');
-          } else {
             const data = await getUserData({ userId });
             if (data.balance !== undefined && data.balance !== null) {
               setBalance(data.balance);
@@ -63,7 +58,6 @@ export default function BalanceCard({ userId }: { userId: string | null }) {
               setBalance(0);
               localStorage.setItem('userBalance', '0');
             }
-          }
         } catch (error) {
           console.error(error);
           toast({ variant: "destructive", title: "Erreur inattendue", description: "Impossible de récupérer le solde." });
