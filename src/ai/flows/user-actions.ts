@@ -81,8 +81,9 @@ const registerUserFlow = ai.defineFlow(
 
       return { userId: userId };
     } catch (e: any) {
-      console.error(e);
-      return { error: `Une erreur est survenue lors de la création du compte: ${e.message}` };
+      console.error("registerUserFlow Error:", e);
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      return { error: `Une erreur est survenue lors de la création du compte: ${errorMessage}` };
     }
   }
 );
@@ -134,8 +135,9 @@ const loginUserFlow = ai.defineFlow(
             
             return { userId: user.id, name: user.name };
         } catch (e: any) {
-            console.error(e);
-            return { error: `Une erreur est survenue lors de la connexion: ${e.message}` };
+            console.error("loginUserFlow Error:", e);
+            const errorMessage = e instanceof Error ? e.message : String(e);
+            return { error: `Une erreur est survenue lors de la connexion: ${errorMessage}` };
         }
     }
 );
@@ -187,7 +189,7 @@ const getUserDataFlow = ai.defineFlow(
                 currency: accountData.currency,
             };
         } catch (e: any) {
-            console.error(e);
+            console.error("getUserDataFlow Error:", e);
             const errorMessage = e instanceof Error ? e.message : String(e);
             return { error: `Une erreur est survenue lors de la récupération des données: ${errorMessage}` };
         }
@@ -235,8 +237,9 @@ const sendOtpFlow = ai.defineFlow(
       return { otp };
 
     } catch (e: any) {
-      console.error(e);
-      return { error: `Une erreur est survenue lors de l'envoi de l'OTP: ${e.message}` };
+      console.error("sendOtpFlow Error:", e);
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      return { error: `Une erreur est survenue lors de l'envoi de l'OTP: ${errorMessage}` };
     }
   }
 );

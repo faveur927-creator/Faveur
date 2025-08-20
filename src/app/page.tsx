@@ -39,19 +39,15 @@ function DashboardContent() {
     }
 
     const fetchData = async () => {
+      setIsLoading(true);
       try {
         const data = await getUserData({ userId: storedUserId });
         if (data.error) {
-            // Silently redirect if the client is offline or the user is not found,
-            // as this likely means the session is just invalid.
-            if (data.error.includes("offline") || data.error.includes("non trouvé")) {
-                 console.warn("Session validation failed, redirecting to login:", data.error);
-            } else {
-                // Show a toast for other, more critical errors.
-                toast({ variant: 'destructive', title: 'Erreur de session', description: data.error });
-            }
-            localStorage.clear();
-            router.push('/login');
+           console.error("Session validation failed:", data.error);
+           // Any error from getUserData (not found, network issue, etc.) should lead to logout.
+           // No need to show a toast here, as it's a normal security flow.
+           localStorage.clear();
+           router.push('/login');
         } else {
           setUserId(storedUserId);
           setUserName(data.name || null);
@@ -60,18 +56,20 @@ function DashboardContent() {
           localStorage.setItem('userName', data.name || '');
           localStorage.setItem('userEmail', data.email || '');
           localStorage.setItem('userBalance', (data.balance || 0).toString());
-          setIsLoading(false);
         }
       } catch (error) {
-        toast({ variant: 'destructive', title: 'Erreur critique', description: 'Impossible de contacter le serveur.' });
+        // This catch block handles critical failures in the flow itself.
+        toast({ variant: 'destructive', title: 'Erreur critique', description: 'Une erreur inattendue est survenue. Veuillez vous reconnecter.' });
         localStorage.clear();
         router.push('/login');
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, toast]);
+  }, [router]);
   
    const updateBalanceFromStorage = () => {
     const storedBalance = localStorage.getItem('userBalance');
