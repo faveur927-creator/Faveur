@@ -9,31 +9,28 @@ import RecentTransactions from '@/components/recent-transactions';
 import ExpensesChart from '@/components/expenses-chart';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import TransactionsPage from './dashboard/transactions/page';
+import TransactionsPage from './transactions/page';
 import VendorSpace from '@/components/vendor-space';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [isAuth, setIsAuth] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // We need to check for the auth key in localStorage.
-    // This code will only run on the client side, after hydration.
     const authStatus = localStorage.getItem('userId');
     if (!authStatus) {
       router.push('/login');
     } else {
-        setIsAuth(true);
+      setIsAuthenticated(true);
     }
   }, [router]);
 
-  // If the user is not authenticated, we render nothing to avoid flashing the dashboard.
-  // The useEffect above will handle the redirection.
-  if (!isAuth) {
-    return null; 
+  // Ne rend les enfants que si l'utilisateur est authentifié
+  if (!isAuthenticated) {
+    return null; // Ou un spinner de chargement
   }
 
   return <>{children}</>;
@@ -106,10 +103,8 @@ function DashboardContent() {
 
 export default function DashboardPage() {
   return (
-    <Suspense fallback={<div>Chargement...</div>}>
       <AuthGuard>
         <DashboardContent />
       </AuthGuard>
-    </Suspense>
   )
 }

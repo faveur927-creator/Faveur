@@ -123,14 +123,13 @@ const loginUserFlow = ai.defineFlow(
             }
 
             const user = querySnapshot.docs[0].data();
+            
+            // In a real app, you would compare hashed passwords.
+            // For this demo, we do a simple string comparison.
+            const isPasswordValid = user.password === password;
 
-            // If the user signed up with Google, their password is a special key.
-            // We allow them to log in via Google button without entering it again.
-            if (!password.startsWith('google_auth_')) {
-              const isPasswordValid = user.password === password;
-              if (!isPasswordValid) {
-                  return { error: "L'e-mail ou le mot de passe est incorrect." };
-              }
+            if (!isPasswordValid) {
+                return { error: "L'e-mail ou le mot de passe est incorrect." };
             }
             
             return { userId: user.id, name: user.name };
@@ -227,8 +226,10 @@ const sendOtpFlow = ai.defineFlow(
             return { error: "Un utilisateur avec cet e-mail existe déjà." }
         }
 
+      // In a real app, you would send this via email or SMS.
+      // Here, we just generate it and return it for the frontend to display.
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      console.log(`OTP for ${email} is: ${otp}`); 
+      console.log(`OTP for ${email} is: ${otp}`); // For debugging
 
       return { otp };
 
