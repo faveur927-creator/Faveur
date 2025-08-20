@@ -22,8 +22,8 @@ import {
 import { Home, ShoppingCart, Wallet, Settings, Bell, Store, BarChart, Package, PlusCircle, LayoutGrid, Truck, ArrowRightLeft } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard-header';
 import Logo from '@/components/logo';
-import { usePathname } from 'next/navigation';
-import React from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { useEffect } from 'react';
 
 // export const metadata: Metadata = {
 //   title: 'SuperApp',
@@ -37,8 +37,16 @@ export default function RootLayout({
 }>) {
 
   const pathname = usePathname();
+  const router = useRouter();
   const noLayoutPages = ['/login', '/register'];
   const showLayout = !noLayoutPages.includes(pathname);
+  
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    if (!userId && !noLayoutPages.includes(pathname)) {
+        router.push('/login');
+    }
+  }, [pathname, router]);
 
 
   return (

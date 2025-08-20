@@ -15,34 +15,18 @@ import VendorSpace from '@/components/vendor-space';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 function DashboardContent() {
-  const router = useRouter();
   const [userName, setUserName] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   
   const searchParams = useSearchParams();
   const defaultTab = searchParams.get('tab') || 'overview';
 
   useEffect(() => {
     const storedUserId = localStorage.getItem('userId');
-    if (!storedUserId) {
-      router.push('/login');
-    } else {
-      const storedUserName = localStorage.getItem('userName');
-      setUserId(storedUserId);
-      setUserName(storedUserName);
-      setIsCheckingAuth(false);
-    }
-  }, [router]);
-  
-  if (isCheckingAuth) {
-    // Affiche un écran de chargement pendant la vérification pour éviter un flash de contenu
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div>Chargement...</div>
-      </div>
-    );
-  }
+    const storedUserName = localStorage.getItem('userName');
+    setUserId(storedUserId);
+    setUserName(storedUserName);
+  }, []);
 
   return (
     <div className="flex flex-col gap-6">
