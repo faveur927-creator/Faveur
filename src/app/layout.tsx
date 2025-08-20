@@ -115,7 +115,7 @@ export default function RootLayout({
                     <SidebarGroup>
                       <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
                         <SidebarMenuItem>
-                            <SidebarMenuButton asChild isActive={pathname === '/' && !usePathname().includes('?')}>
+                            <SidebarMenuButton asChild isActive={pathname === '/'}>
                               <Link href="/">
                                 <Home />
                                 Tableau de bord
@@ -123,16 +123,16 @@ export default function RootLayout({
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                         <SidebarMenuItem>
-                          <SidebarMenuButton asChild isActive={pathname.includes('?tab=transactions')}>
-                            <Link href="/?tab=transactions">
+                          <SidebarMenuButton asChild isActive={pathname.includes('/transactions')}>
+                            <Link href="/transactions">
                               <Wallet />
                               Transactions
                             </Link>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
                         <SidebarMenuItem>
-                          <SidebarMenuButton asChild isActive={pathname.includes('?tab=marketplace')}>
-                            <Link href="/?tab=marketplace">
+                          <SidebarMenuButton asChild isActive={pathname.includes('/marketplace')}>
+                            <Link href="/marketplace">
                               <ShoppingCart />
                               Marché
                             </Link>
@@ -151,8 +151,8 @@ export default function RootLayout({
                     <SidebarGroup>
                         <SidebarGroupLabel>Espace Vendeur</SidebarGroupLabel>
                         <SidebarMenuItem>
-                            <SidebarMenuButton asChild isActive={pathname.includes('?tab=vendor')}>
-                              <Link href="/?tab=vendor">
+                            <SidebarMenuButton asChild isActive={pathname === '/dashboard/vendor/dashboard'}>
+                              <Link href="/dashboard/vendor/dashboard">
                                 <LayoutGrid />
                                 Aperçu
                               </Link>
