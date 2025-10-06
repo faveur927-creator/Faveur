@@ -76,11 +76,12 @@ export default function RegisterPage() {
 
           router.push('/'); // Redirect to dashboard
         } else {
-            toast({ variant: "destructive", title: "Erreur d'inscription", description: registerResult.error });
+            toast({ variant: "destructive", title: "Erreur d'inscription", description: registerResult.error || "Une erreur inconnue est survenue." });
             setStep('register'); // Go back to registration form on error
         }
       } catch (error) {
-         toast({ variant: "destructive", title: "Erreur", description: "Une erreur est survenue lors de la finalisation de l'inscription." });
+         console.error("Erreur lors de la finalisation de l'inscription:", error);
+         toast({ variant: "destructive", title: "Erreur", description: "Un problème est survenue lors de la finalisation de l'inscription." });
       }
     } else {
       toast({ variant: "destructive", title: "Code incorrect", description: "Le code OTP que vous avez entré n'est pas valide. Veuillez réessayer." });
