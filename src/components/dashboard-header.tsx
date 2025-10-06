@@ -1,8 +1,7 @@
 
-
 "use client";
 
-import { Search, Bell, ShoppingCart } from 'lucide-react';
+import { Search, Bell, ShoppingCart, Camera } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -14,7 +13,17 @@ import { useEffect, useState } from 'react';
 import { useQueryParams } from '@/hooks/use-query-params';
 import { Badge } from './ui/badge';
 import CartSheet from './cart-sheet';
-
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 export default function DashboardHeader() {
   const router = useRouter();
@@ -100,6 +109,27 @@ export default function DashboardHeader() {
         />
       </div>
       <div className="flex items-center gap-2">
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <Camera className="h-5 w-5" />
+              <span className="sr-only">Rechercher par image</span>
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Recherche par Image (Bientôt !)</AlertDialogTitle>
+              <AlertDialogDescription>
+                Cette fonctionnalité vous permettra de téléverser une image pour trouver des produits similaires dans notre marché. Elle est en cours de développement.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Annuler</AlertDialogCancel>
+              <AlertDialogAction disabled>Téléverser une image</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         <CartSheet>
           <Button variant="ghost" size="icon" className="rounded-full relative">
               <ShoppingCart className="h-5 w-5" />
