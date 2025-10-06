@@ -17,6 +17,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import React from 'react';
+import RecommendedProducts from './recommended-products';
 
 type Product = typeof products[0];
 
@@ -72,7 +73,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
         <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
@@ -139,6 +140,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           </div>
         </CardContent>
       </Card>
+
+      <RecommendedProducts category={product.category} currentProductId={product.id} />
     </div>
   );
 }
