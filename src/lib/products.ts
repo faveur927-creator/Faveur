@@ -1,5 +1,5 @@
 
-import { placeholderImages } from "./placeholder-images";
+const placeholderImages = require("./placeholder-images.json");
 
 export const products = [
     {
