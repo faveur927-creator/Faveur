@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import React from 'react';
 import RecommendedProducts from './recommended-products';
-import { placeholderImages } from '@/lib/placeholder-images';
+import placeholderImages from '@/lib/placeholder-images.json';
 
 type Product = typeof products[0];
 
