@@ -1,0 +1,50 @@
+{
+  "casque": {
+    "src": "https://picsum.photos/seed/casque/600/400",
+    "width": 600,
+    "height": 400,
+    "dataAiHint": "headphones music"
+  },
+  "tracker": {
+    "src": "https://picsum.photos/seed/tracker/600/400",
+    "width": 600,
+    "height": 400,
+    "dataAiHint": "smart watch"
+  },
+  "cafe": {
+    "src": "https://picsum.photos/seed/cafe/600/400",
+    "width": 600,
+    "height": 400,
+    "dataAiHint": "coffee maker"
+  },
+  "chaise": {
+    "src": "https://picsum.photos/seed/chaise/600/400",
+    "width": 600,
+    "height": 400,
+    "dataAiHint": "office chair"
+  },
+  "tshirt": {
+    "src": "https://picsum.photos/seed/tshirt/600/400",
+    "width": 600,
+    "height": 400,
+    "dataAiHint": "tshirt clothes"
+  },
+  "baskets": {
+    "src": "https://picsum.photos/seed/baskets/600/400",
+    "width": 600,
+    "height": 400,
+    "dataAiHint": "sneakers shoes"
+  },
+  "nutrition": {
+    "src": "https://picsum.photos/seed/nutrition/600/400",
+    "width": 600,
+    "height": 400,
+    "dataAiHint": "healthy food"
+  },
+  "panier": {
+    "src": "https://picsum.photos/seed/panier/600/400",
+    "width": 600,
+    "height": 400,
+    "dataAiHint": "vegetable basket"
+  }
+}

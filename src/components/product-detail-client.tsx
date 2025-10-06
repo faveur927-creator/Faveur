@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import React from 'react';
 import RecommendedProducts from './recommended-products';
+import { placeholderImages } from '@/lib/placeholder-images';
 
 type Product = typeof products[0];
 
@@ -25,10 +26,17 @@ interface ProductDetailClientProps {
   product: Product;
 }
 
+const findImageKey = (imageSrc: string) => {
+    return Object.keys(placeholderImages).find(key => placeholderImages[key as keyof typeof placeholderImages].src === imageSrc);
+}
+
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
   const router = useRouter();
   const { toast } = useToast();
   
+  const imageKey = findImageKey(product.image);
+  const imageDetails = imageKey ? placeholderImages[imageKey as keyof typeof placeholderImages] : null;
+
   const handleAddToCart = () => {
     // Simulate adding to cart using localStorage
     try {
@@ -98,7 +106,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 <Image 
                     src={product.image}
                     alt={product.name}
-                    fill
+                    width={imageDetails?.width || 600}
+                    height={imageDetails?.height || 400}
                     className="object-cover"
                     data-ai-hint={product.dataAiHint}
                 />

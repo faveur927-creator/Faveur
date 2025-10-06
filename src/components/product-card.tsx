@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ShoppingCart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { placeholderImages } from '@/lib/placeholder-images';
 
 type Product = {
   id: string;
@@ -20,8 +21,17 @@ type Product = {
   description: string;
 };
 
+// Find the key in placeholderImages that matches the product image src
+const findImageKey = (imageSrc: string) => {
+    return Object.keys(placeholderImages).find(key => placeholderImages[key as keyof typeof placeholderImages].src === imageSrc);
+}
+
+
 export default function ProductCard({ product }: { product: Product }) {
     const { toast } = useToast();
+
+    const imageKey = findImageKey(product.image);
+    const imageDetails = imageKey ? placeholderImages[imageKey as keyof typeof placeholderImages] : null;
 
     const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault(); // Prevent any parent Link navigation
@@ -59,7 +69,8 @@ export default function ProductCard({ product }: { product: Product }) {
             <Image
                 src={product.image}
                 alt={product.name}
-                fill
+                width={imageDetails?.width || 600}
+                height={imageDetails?.height || 400}
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
                 data-ai-hint={product.dataAiHint}
             />
