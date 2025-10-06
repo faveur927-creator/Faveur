@@ -1,23 +1,45 @@
+
+"use client";
+
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DollarSign, Package, ShoppingCart, Percent, ArrowUp, ArrowDown } from 'lucide-react';
 import { products } from '@/lib/products';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const topProducts = products.slice(0, 5).map(p => ({
-    ...p,
-    sales: Math.floor(Math.random() * 50) + 10,
-    revenue: p.price * (Math.floor(Math.random() * 50) + 10),
-})).sort((a,b) => b.revenue - a.revenue);
-
-const kpiData = {
-    totalRevenue: { value: 1250000, change: 20.1, changeType: 'increase' },
-    totalSales: { value: 120, change: 15, changeType: 'increase' },
-    conversionRate: { value: 2.3, change: 0.2, changeType: 'increase' },
-    averageOrderValue: { value: 10416, change: 5.1, changeType: 'decrease' },
+type KpiData = {
+    totalRevenue: { value: number; change: number; changeType: 'increase' | 'decrease' };
+    totalSales: { value: number; change: number; changeType: 'increase' | 'decrease' };
+    conversionRate: { value: number; change: number; changeType: 'increase' | 'decrease' };
+    averageOrderValue: { value: number; change: number; changeType: 'increase' | 'decrease' };
 };
 
+type TopProduct = (typeof products[0]) & { sales: number; revenue: number; };
 
 export default function VendorAnalyticsPage() {
+    const [kpiData, setKpiData] = useState<KpiData | null>(null);
+    const [topProducts, setTopProducts] = useState<TopProduct[] | null>(null);
+
+    useEffect(() => {
+        // Generate this data on the client to avoid hydration errors
+        const generatedTopProducts = products.slice(0, 5).map(p => ({
+            ...p,
+            sales: Math.floor(Math.random() * 50) + 10,
+            revenue: p.price * (Math.floor(Math.random() * 50) + 10),
+        })).sort((a,b) => b.revenue - a.revenue);
+
+        const generatedKpiData = {
+            totalRevenue: { value: 1250000, change: 20.1, changeType: 'increase' as const },
+            totalSales: { value: 120, change: 15, changeType: 'increase' as const },
+            conversionRate: { value: 2.3, change: 0.2, changeType: 'increase' as const },
+            averageOrderValue: { value: 10416, change: 5.1, changeType: 'decrease' as const },
+        };
+
+        setTopProducts(generatedTopProducts);
+        setKpiData(generatedKpiData);
+    }, []);
+
     return (
         <div className="flex flex-col gap-8">
             <div>
@@ -26,58 +48,74 @@ export default function VendorAnalyticsPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Revenu Total</CardTitle>
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{kpiData.totalRevenue.value.toLocaleString('fr-FR')} FCFA</div>
-                        <p className="text-xs text-muted-foreground flex items-center">
-                            <ArrowUp className="h-4 w-4 text-green-500" />
-                            {kpiData.totalRevenue.change}% ce mois-ci
-                        </p>
-                    </CardContent>
-                </Card>
-                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Ventes Totales</CardTitle>
-                        <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">+{kpiData.totalSales.value}</div>
-                        <p className="text-xs text-muted-foreground flex items-center">
-                             <ArrowUp className="h-4 w-4 text-green-500" />
-                            {kpiData.totalSales.change}% ce mois-ci
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Taux de Conversion</CardTitle>
-                        <Percent className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{kpiData.conversionRate.value}%</div>
-                        <p className="text-xs text-muted-foreground flex items-center">
-                            <ArrowUp className="h-4 w-4 text-green-500" />
-                            +{kpiData.conversionRate.change}% depuis hier
-                        </p>
-                    </CardContent>
-                </Card>
-                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Panier Moyen</CardTitle>
-                        <Package className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                     <CardContent>
-                        <div className="text-2xl font-bold">{kpiData.averageOrderValue.value.toLocaleString('fr-FR')} FCFA</div>
-                        <p className="text-xs text-muted-foreground flex items-center">
-                           <ArrowDown className="h-4 w-4 text-red-500" />
-                            {kpiData.averageOrderValue.change}% ce mois-ci
-                        </p>
-                    </CardContent>
-                </Card>
+                {kpiData ? (
+                    <>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Revenu Total</CardTitle>
+                                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{kpiData.totalRevenue.value.toLocaleString('fr-FR')} FCFA</div>
+                                <p className="text-xs text-muted-foreground flex items-center">
+                                    <ArrowUp className="h-4 w-4 text-green-500" />
+                                    {kpiData.totalRevenue.change}% ce mois-ci
+                                </p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Ventes Totales</CardTitle>
+                                <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">+{kpiData.totalSales.value}</div>
+                                <p className="text-xs text-muted-foreground flex items-center">
+                                    <ArrowUp className="h-4 w-4 text-green-500" />
+                                    {kpiData.totalSales.change}% ce mois-ci
+                                </p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Taux de Conversion</CardTitle>
+                                <Percent className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{kpiData.conversionRate.value}%</div>
+                                <p className="text-xs text-muted-foreground flex items-center">
+                                    <ArrowUp className="h-4 w-4 text-green-500" />
+                                    +{kpiData.conversionRate.change}% depuis hier
+                                </p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Panier Moyen</CardTitle>
+                                <Package className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{kpiData.averageOrderValue.value.toLocaleString('fr-FR')} FCFA</div>
+                                <p className="text-xs text-muted-foreground flex items-center">
+                                <ArrowDown className="h-4 w-4 text-red-500" />
+                                    {kpiData.averageOrderValue.change}% ce mois-ci
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </>
+                ) : (
+                    Array.from({ length: 4 }).map((_, index) => (
+                        <Card key={index}>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <Skeleton className="h-4 w-2/3" />
+                            </CardHeader>
+                            <CardContent>
+                                <Skeleton className="h-8 w-1/2 mb-2" />
+                                <Skeleton className="h-4 w-full" />
+                            </CardContent>
+                        </Card>
+                    ))
+                )}
             </div>
 
             <Card>
@@ -86,24 +124,36 @@ export default function VendorAnalyticsPage() {
                     <CardDescription>Vos produits les plus vendus ce mois-ci.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Produit</TableHead>
-                                <TableHead className="text-center">Ventes</TableHead>
-                                <TableHead className="text-right">Revenu</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {topProducts.map((product) => (
-                                <TableRow key={product.id}>
-                                    <TableCell className="font-medium">{product.name}</TableCell>
-                                    <TableCell className="text-center">{product.sales}</TableCell>
-                                    <TableCell className="text-right">{product.revenue.toLocaleString('fr-FR')} FCFA</TableCell>
+                     {topProducts ? (
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Produit</TableHead>
+                                    <TableHead className="text-center">Ventes</TableHead>
+                                    <TableHead className="text-right">Revenu</TableHead>
                                 </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {topProducts.map((product) => (
+                                    <TableRow key={product.id}>
+                                        <TableCell className="font-medium">{product.name}</TableCell>
+                                        <TableCell className="text-center">{product.sales}</TableCell>
+                                        <TableCell className="text-right">{product.revenue.toLocaleString('fr-FR')} FCFA</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                     ) : (
+                        <div className="space-y-4">
+                            {Array.from({ length: 5 }).map((_, index) => (
+                                <div key={index} className="flex justify-between items-center">
+                                    <Skeleton className="h-5 w-1/3" />
+                                    <Skeleton className="h-5 w-1/6" />
+                                    <Skeleton className="h-5 w-1/4" />
+                                </div>
                             ))}
-                        </TableBody>
-                    </Table>
+                        </div>
+                     )}
                 </CardContent>
             </Card>
         </div>
