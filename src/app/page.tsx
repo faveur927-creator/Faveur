@@ -41,6 +41,11 @@ function DashboardContent() {
       try {
         const data = await getUserData({ userId: storedUserId });
         if (data.error) {
+           // This specific error can happen on first load if firebase is not ready, we can ignore it.
+           if (data.error.includes('offline')) {
+                // Let's just wait, another render will fix it.
+                return;
+           }
            console.error("Session validation failed:", data.error);
            toast({ variant: 'destructive', title: 'Session invalide', description: 'Veuillez vous reconnecter.' });
            localStorage.clear();
@@ -82,7 +87,7 @@ function DashboardContent() {
   }, []);
 
 
-  if (isLoading) {
+  if (isLoading && !userName) {
     return (
         <div className="flex justify-center items-center h-screen">
             <Loader2 className="h-16 w-16 animate-spin text-primary" />
