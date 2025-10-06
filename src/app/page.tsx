@@ -38,6 +38,7 @@ function DashboardContent() {
     }
 
     const fetchData = async () => {
+      setIsLoading(true);
       try {
         const data = await getUserData({ userId: storedUserId });
         if (data.error) {
@@ -87,7 +88,7 @@ function DashboardContent() {
   }, []);
 
 
-  if (isLoading && !userName) {
+  if (isLoading) {
     return (
         <div className="flex justify-center items-center h-screen">
             <Loader2 className="h-16 w-16 animate-spin text-primary" />
